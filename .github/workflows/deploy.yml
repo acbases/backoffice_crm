@@ -26,4 +26,5 @@ jobs:
             --exclude=".git" \
             --exclude="node_modules" \
             -e "ssh -i ~/.ssh/id_ed25519" \
-            ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
+            ./dist/ \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
