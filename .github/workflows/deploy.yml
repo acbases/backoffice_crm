@@ -28,3 +28,16 @@ jobs:
             -e "ssh -i ~/.ssh/id_ed25519" \
             ./dist/ \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
+
+      - name: Notify Slack
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            STATUS="✅ Deploy react succeeded"
+          else
+            STATUS="❌ Deploy react failed"
+          fi
+
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"${STATUS} in `${{ github.repository }}` on branch `${{ github.ref_name }}`\"}" \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
