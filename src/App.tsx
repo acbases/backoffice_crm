@@ -1,18 +1,30 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Navigate, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
-import Home from "./pages/Home";
-import Settings from "./pages/Settings";
-import Dashboard from "./pages/Dashboard";
-import RecruterPage from "./features/recruter/RecruterPage";
+import Visite from "./pages/Visite/Visite";
+import Clients from "./pages/Clients/Clients";
+import AjoutClient from "./pages/Clients/pages/AjoutClient";
+import ListeClient from "./pages/Clients/pages/ListeClient";
+import AjoutVisite from "./pages/Visite/pages/AjoutVisite";
+import ListeVisite from "./pages/Visite/pages/ListeVisite";
+import ClientQrCode from "./pages/Clients/pages/QrCode";
+import Dashboard from "./pages/Dashboard/Dashboard";
 
 export default function App() {
   return (
-    <Router>
+    <Router basename="/crm_admin">
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="recruter" element={<RecruterPage />} />
+          <Route path="client" element={<Clients />}>
+            <Route index element={<Navigate to="ajout" replace />} />
+            <Route path="ajout" element={<AjoutClient />} />
+            <Route path="liste" element={<ListeClient />} />
+            <Route path="qr-code" element={<ClientQrCode />} />
+          </Route>
+          <Route path="visite" element={<Visite />} >
+            <Route index element={<Navigate to="ajout" replace />} />
+            <Route path="ajout" element={<AjoutVisite />} />
+            <Route path="liste" element={<ListeVisite />} />
+          </Route>
           <Route path="dashboard" element={<Dashboard />} />
         </Route>
       </Routes>

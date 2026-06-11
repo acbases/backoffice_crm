@@ -4,11 +4,10 @@ import { motion, AnimatePresence } from "motion/react";
 import { 
   Menu, 
   X, 
-  Home, 
-  Settings, 
-  LayoutDashboard, 
   ChevronLeft, 
-  ChevronRight 
+  ChevronRight, 
+  UserStar,
+  MapPinPen
 } from "lucide-react";
 
 interface NavItemProps {
@@ -28,7 +27,7 @@ const NavItem = ({ item, isCollapsed, onClick }: NavItemProps) => (
     className={({ isActive }) => `
       flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200
       ${isActive 
-        ? "bg-blue-50 text-blue-600 font-semibold" 
+        ? "bg-red-50 text-red-600 font-semibold" 
         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}
     `}
     onClick={onClick}
@@ -68,10 +67,9 @@ export default function Layout() {
   }, []);
 
   const navItems = [
-    { name: "Home", path: "/", icon: Home },
-    { name: "Settings", path: "/settings", icon: Settings },
-    { name: "Recruter", path: "/recruter", icon: LayoutDashboard },
-    { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+    // { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+    { name: "Client", path: "/client/ajout", icon: UserStar },
+    { name: "Visite", path: "/visite/ajout", icon: MapPinPen },
   ];
 
   const sidebarVariants = {
@@ -93,7 +91,7 @@ export default function Layout() {
         >
           <Menu size={24} />
         </button>
-        <span className="ml-4 font-semibold text-lg text-gray-900 font-sans">My App</span>
+        <span className="ml-4 font-semibold text-lg text-gray-900 font-sans">CRM ADMIN</span>
       </header>
 
       {/* Desktop Sidebar */}
@@ -107,10 +105,10 @@ export default function Layout() {
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 shrink-0">
           {!isSidebarOpen ? (
             <div className="w-full flex justify-center">
-               <span className="text-xl font-bold text-blue-600">A</span>
+               <span className="text-xl font-bold text-red-600">CRM</span>
             </div>
           ) : (
-            <span className="text-xl font-bold text-blue-600 ml-2">My App</span>
+            <span className="text-xl font-bold text-red-600 ml-2">CRM ADMIN</span>
           )}
         </div>
 
@@ -154,7 +152,7 @@ export default function Layout() {
               id="mobile-sidebar"
             >
               <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200 shrink-0">
-                <span className="text-xl font-bold text-blue-600">My App</span>
+                <span className="text-xl font-bold text-red-600">My App</span>
                 <button 
                   onClick={() => setIsMobileMenuOpen(false)} 
                   className="p-2 -mr-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -183,7 +181,7 @@ export default function Layout() {
         className="flex-1 flex flex-col min-w-0 overflow-y-auto"
         id="main-content"
       >
-        <div className="pt-16 md:pt-8 p-6 md:p-8 lg:p-10 w-full max-w-6xl mx-auto">
+        <div className="p-6 w-full mx-auto">
           <Outlet />
         </div>
       </main>
