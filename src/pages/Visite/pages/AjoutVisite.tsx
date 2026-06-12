@@ -57,7 +57,7 @@ export default function AjoutVisite() {
         >
             <div>
                 <h2 className="text-lg font-semibold text-gray-900">
-                    Ajouter un visite non planifié
+                    Planifier une visite pour un utilisateur 
                 </h2>
             </div>
 

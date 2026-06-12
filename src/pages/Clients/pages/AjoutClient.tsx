@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { createClient } from "../api/clientApi";
+import { getAgences, type agencetItem } from "../api/agenceApi";
+import {
+  getCategorieClients,
+  type categorieClientItem,
+} from "../api/categorieClientApi";
 
 const initialForm = {
   nom: "",
@@ -18,7 +23,25 @@ export default function AjoutClient() {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [agences, setAgences] = useState<agencetItem[]>([]);
+  const [categories, setCategories] = useState<categorieClientItem[]>([]);
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [agencesData, categoriesData] = await Promise.all([
+          getAgences(),
+          getCategorieClients(),
+        ]);
 
+        setAgences(agencesData);
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Erreur chargement listes :", error);
+      }
+    };
+
+    loadData();
+  }, []);
   const handleChange = (
     field: keyof typeof initialForm,
     value: string
@@ -130,26 +153,38 @@ export default function AjoutClient() {
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block space-y-1">
           <span className="text-sm font-medium text-gray-700">Id agence</span>
-          <input
+          <select
             value={form.idagence}
             onChange={(event) => handleChange("idagence", event.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
-            type="number"
-            step="1"
             required
-          />
+          >
+            <option value="">Sélectionner une agence</option>
+
+            {agences.map((agence) => (
+              <option key={agence.id} value={agence.id}>
+                {agence.intitule}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label className="block space-y-1">
           <span className="text-sm font-medium text-gray-700">Id categorie</span>
-          <input
+          <select
             value={form.idcategorie}
             onChange={(event) => handleChange("idcategorie", event.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
-            type="number"
-            step="1"
             required
-          />
+          >
+            <option value="">Sélectionner une catégorie</option>
+
+            {categories.map((categorie) => (
+              <option key={categorie.id} value={categorie.id}>
+                {categorie.intitule}
+              </option>
+            ))}
+          </select>
         </label>
       </div>
 
