@@ -144,7 +144,7 @@ export default function ClientFilters({
         }))}
       />
       <label className="flex flex-col gap-1.5 text-sm text-gray-600" htmlFor="qr-code-filter">
-        <span className="font-medium text-gray-700">QR code</span>
+        <span className="font-medium text-gray-700">Avec QR code</span>
         <select
           id="qr-code-filter"
           value={qrCodeFilter}
@@ -152,8 +152,8 @@ export default function ClientFilters({
           className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           <option value="all">Tous ({totalCount})</option>
-          <option value="with">Avec QR code ({withQrCodeCount})</option>
-          <option value="without">Sans QR code ({withoutQrCodeCount})</option>
+          <option value="with">Oui ({withQrCodeCount})</option>
+          <option value="without">Non ({withoutQrCodeCount})</option>
         </select>
       </label>
     </div>

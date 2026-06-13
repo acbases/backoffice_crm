@@ -14,6 +14,7 @@ export default function App() {
     <Router basename="/crm_admin">
       <Routes>
         <Route path="/" element={<Layout />}>
+          <Route index element={<Navigate to="client" replace />} />
           <Route path="client" element={<Clients />}>
             <Route index element={<Navigate to="ajout" replace />} />
             <Route path="ajout" element={<AjoutClient />} />

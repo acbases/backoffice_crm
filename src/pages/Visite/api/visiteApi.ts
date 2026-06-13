@@ -26,40 +26,53 @@ export async function createVisite(payload: VisitePayload) {
   return data;
 }
 
-// GET visites
+// GET all visites
 export type VisiteItem = {
+  id: number;
+  date: string;
+  statut: number;
+  type: number;
+  idtype: number;
+  created_at: string;
+  updated_at: string;
+  object: string | null;
+  client: {
     id: number;
-    date: string;
-    statut: number;
-    type: number;
-    idtype: number;
-    created_at: string;
-    updated_at: string;
-    object: string | null;
-    client: {
-        id: number;
-        nom: string;
-        latitude: string;
-        longitude: string;
-        zone: string;
-        quartier: string;
-        idagence: number;
-        idcategorie: number;
-        status_qrcode: boolean;
-        categorie_client: {
-            id: number;
-            intitule: string;
-        };
+    nom: string;
+    latitude: string;
+    longitude: string;
+    zone: string;
+    quartier: string;
+    idagence: number;
+    idcategorie: number;
+    status_qrcode: boolean;
+    categorie_client: {
+      id: number;
+      intitule: string;
     };
-    categorie_visite: {
-        id: number;
-        intitule: string;
-    };
-    type_visite: {
-        id: number;
-        nom: string;
-    };
+  };
+  categorie_visite: {
+    id: number;
+    intitule: string;
+  };
+  type_visite: {
+    id: number;
+    nom: string;
+  };
+  utilisateur: {
+    id: number;
+    name: string;
+    email: string;
+    matricule: string;
+    firstname: string;
+    statut: boolean;
+    role_crm: string;
+  }
 };
+export async function getVisiteById(id: string | number) {
+  const { data } = await api.get<VisiteItem>(`/visite/${id}`);
+  return data;
+}
 export async function getVisites() {
   const { data } = await api.get<VisiteItem[]>("/visite");
   return data;

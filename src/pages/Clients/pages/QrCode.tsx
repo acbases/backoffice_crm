@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import type { ClientsContext } from "../Clients";
-import { getClientQrCode } from "../api/clientApi";
+import { getClientQrCode, updateClient } from "../api/clientApi";
 
 const getQuartierLabel = (quartier: string | { intitule: string }) =>
   typeof quartier === "object" ? quartier.intitule : quartier;
@@ -28,6 +28,7 @@ export default function ClientQrCode() {
     if (!selectedClient) {
       setQrUrl("");
       setError("");
+      setQrBlob(null);
       return;
     }
 
@@ -44,6 +45,7 @@ export default function ClientQrCode() {
 
         if (active) {
           setQrUrl(objectUrl);
+          setQrBlob(blob);
         } else {
           URL.revokeObjectURL(objectUrl);
         }
@@ -51,6 +53,7 @@ export default function ClientQrCode() {
         if (active) {
           setError("QR image unavailable.");
           setQrUrl("");
+          setQrBlob(null);
         }
       } finally {
         if (active) {
@@ -68,6 +71,35 @@ export default function ClientQrCode() {
       }
     };
   }, [selectedClient]);
+
+  const [qrBlob, setQrBlob] = useState<Blob | null>(null);
+
+  const handleDownload = () => {
+    if (!qrBlob || !selectedClient) return;
+    const url = URL.createObjectURL(qrBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${selectedClient.nom}-qr-code.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const [activating, setActivating] = useState(false);
+
+  const handleActivateStatus = async () => {
+    if (!selectedClient || activating || selectedClient.status_qrcode) return;
+    setActivating(true);
+    try {
+      const updated = await updateClient(selectedClient.id, { status_qrcode: true });
+      setSelectedClientId(String(updated.id));
+    } catch (err) {
+      console.error("Failed to activate QR code status:", err);
+    } finally {
+      setActivating(false);
+    }
+  };
 
   if (!selectedClient) {
     return (
@@ -101,17 +133,49 @@ export default function ClientQrCode() {
         </select>
       </label>
 
-      <div className="flex items-center justify-center rounded-xl bg-gray-50 p-6">
+      <div className="flex flex-col items-center justify-center rounded-xl bg-gray-50 p-6 space-y-4">
         {loading ? (
           <div className="text-sm text-gray-500">Loading QR code...</div>
         ) : error ? (
           <div className="text-sm text-gray-500">{error}</div>
         ) : qrUrl ? (
-          <img
-            src={qrUrl}
-            alt={`QR code for ${selectedClient.nom}`}
-            className="h-[400px] w-[400px] rounded-lg border border-gray-200 bg-white p-3"
-          />
+          <>
+            <div className="w-full flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-700">QR Code Status:</span>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  selectedClient.status_qrcode
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {selectedClient.status_qrcode ? "Active" : "Inactive"}
+              </span>
+            </div>
+            <img
+              src={qrUrl}
+              alt={`QR code for ${selectedClient.nom}`}
+              className="h-[400px] w-[400px] rounded-lg border border-gray-200 bg-white p-3"
+            />
+            <div className="w-full flex items-center justify-between space-x-2">
+              <button
+                onClick={handleDownload}
+                disabled={!qrBlob}
+                className="flex-1 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Download QR Code
+              </button>
+              {!selectedClient.status_qrcode && (
+                <button
+                  onClick={handleActivateStatus}
+                  disabled={activating}
+                  className="flex-1 px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {activating ? "Activating..." : "Activate QR Code"}
+                </button>
+              )}
+            </div>
+          </>
         ) : null}
       </div>
 

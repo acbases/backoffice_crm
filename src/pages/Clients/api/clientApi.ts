@@ -77,3 +77,27 @@ export async function getClientQrCode(idclient: number) {
   });
   return response.data as Blob;
 }
+
+// update client 
+// PUT update client
+
+export type UpdateClientPayload = Partial<{
+  nom: string;
+  latitude: number;
+  longitude: number;
+  zone: string;
+  quartier: string;
+  idagence: number;
+  idcategorie: number;
+  status_qrcode: boolean;
+}>;
+
+export async function updateClient(
+  id: number,
+  payload: UpdateClientPayload
+) {
+  const { data } = await api.put<ClientItem>(`/client/${id}`, payload);
+  return data;
+}
+
+

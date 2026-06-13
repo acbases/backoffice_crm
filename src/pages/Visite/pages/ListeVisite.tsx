@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import { motion, AnimatePresence } from "motion/react";
 import type { VisitesContext } from "../Visite";
 import { getVisites } from "../api/visiteApi";
+import DetailVisite from "../components/DetailVisite";
 
 function ListeVisite() {
     const { visites, setVisites, setSelectedVisiteId } =
         useOutletContext<VisitesContext>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedId, setSelectedId] = useState<string | null>(null);
 
     useEffect(() => {
         const loadVisite = async () => {
@@ -29,6 +33,16 @@ function ListeVisite() {
         };
         loadVisite();
     }, [setSelectedVisiteId]);
+
+    const openVisite = (id: number) => {
+        setSelectedId(String(id));
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedId(null);
+    };
 
     if (loading)
         return (
@@ -71,14 +85,16 @@ function ListeVisite() {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500">
-                            <th className="px-5 py-3">Client</th>
-                            <th className="px-5 py-3">Type</th>
-                            <th className="px-5 py-3">Catégorie</th>
-                            <th className="px-5 py-3">Zone / Quartier</th>
-                            <th className="px-5 py-3">Date</th>
-                            <th className="px-5 py-3">Objet</th>
-                            <th className="px-5 py-3">Statut</th>
-                            <th className="px-5 py-3"></th>
+                            <th className="px-1 py-3">Client</th>
+                            <th className="px-1 py-3">Utilisateur</th>
+                            <th className="px-1 py-3">Planifiée</th>
+                            <th className="px-1 py-3">Type</th>
+                            <th className="px-1 py-3">Catégorie</th>
+                            <th className="px-1 py-3">Zone / Quartier</th>
+                            <th className="px-1 py-3">Date</th>
+                            <th className="px-1 py-3">Objet</th>
+                            <th className="px-1 py-3">Statut</th>
+                            <th className="px-1 py-3"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -87,40 +103,52 @@ function ListeVisite() {
                                 key={visite.id}
                                 className="border-b border-gray-100 last:border-0"
                             >
-                                <td className="px-5 py-3 font-medium text-gray-900">
+                                <td className="px-1 py-3 font-medium text-gray-900">
                                     {visite.client?.nom ?? "Client inconnu"}
                                 </td>
-                                <td className="px-5 py-3 text-gray-500">
+                                <td className="px-1 py-3 font-medium text-gray-900">
+                                    {visite.utilisateur
+                                        ? `${visite.utilisateur.firstname ?? ""} ${visite.utilisateur.name ?? ""}`.trim() || "User inconnu"
+                                        : "User inconnu"}
+                                </td>
+
+                                <td className="px-1 py-3 text-center">
+                                    <span className={`px-2.5 py-1 rounded text-sm font-medium ${visite.type === 0 ? 'bg-blue-200' : 'bg-green-200'}`}>
+                                        {visite.type === 0 ? "oui" : "non"}
+                                    </span>
+                                </td>
+
+
+                                <td className="px-1 py-3 text-gray-500">
                                     {visite.type_visite?.nom ?? "—"}
                                 </td>
-                                <td className="px-5 py-3 text-gray-500">
+                                <td className="px-1 py-3 text-gray-500">
                                     {visite.categorie_visite?.intitule ?? "—"}
                                 </td>
-                                <td className="px-5 py-3 text-gray-500">
+                                <td className="px-1 py-3 text-gray-500">
                                     {visite.client?.zone ?? "—"} –{" "}
                                     {visite.client?.quartier ?? "—"}
                                 </td>
-                                <td className="px-5 py-3 text-gray-500">
+                                <td className="px-1 py-3 text-gray-500">
                                     {visite.date ? formatDate(visite.date) : "—"}
                                 </td>
-                                <td className="px-5 py-3 text-gray-500">
+                                <td className="px-1 py-3 text-gray-500">
                                     {visite.object ?? "—"}
                                 </td>
-                                <td className="px-5 py-3">
+                                <td className="px-1 py-3">
                                     <span
-                                        className={`rounded-full px-3 py-1 text-xs font-medium ${
-                                            visite.statut === 1
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-yellow-100 text-yellow-700"
-                                        }`}
+                                        className={`rounded-full px-3 py-1 text-xs font-medium ${visite.statut === 1
+                                            ? "bg-green-100 text-green-700"
+                                            : "bg-yellow-100 text-yellow-700"
+                                            }`}
                                     >
                                         {visite.statut === 1 ? "Terminée" : "En attente"}
                                     </span>
                                 </td>
-                                <td className="px-5 py-3">
+                                <td className="px-1 py-3">
                                     <button
                                         type="button"
-                                        // onClick={() => openVisite(visite.id)}
+                                        onClick={() => openVisite(visite.id)}
                                         className="rounded-lg bg-gray-900 px-4 py-1.5 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
                                     >
                                         Voir
@@ -144,11 +172,10 @@ function ListeVisite() {
                                 {visite.client?.nom ?? "Client inconnu"}
                             </span>
                             <span
-                                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
-                                    visite.statut === 1
-                                        ? "bg-green-100 text-green-700"
-                                        : "bg-yellow-100 text-yellow-700"
-                                }`}
+                                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${visite.statut === 1
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-yellow-100 text-yellow-700"
+                                    }`}
                             >
                                 {visite.statut === 1 ? "Terminée" : "En attente"}
                             </span>
@@ -189,7 +216,7 @@ function ListeVisite() {
                         <div className="flex justify-end">
                             <button
                                 type="button"
-                                // onClick={() => openVisite(visite.id)}
+                                onClick={() => openVisite(visite.id)}
                                 className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black"
                             >
                                 Voir détails
@@ -198,6 +225,31 @@ function ListeVisite() {
                     </div>
                 ))}
             </div>
+
+            {/* Modal */}
+            <AnimatePresence>
+                {isModalOpen && selectedId && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 0.5 }}
+                            exit={{ opacity: 0 }}
+                            onClick={closeModal}
+                            className="fixed inset-0 bg-black z-[60]"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="fixed inset-0 z-[70] flex items-center justify-center p-4 pointer-events-none"
+                        >
+                            <div className="bg-white rounded-2xl shadow-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto">
+                                <DetailVisite id={selectedId} onClose={closeModal} />
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

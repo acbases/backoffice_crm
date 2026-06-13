@@ -201,20 +201,20 @@ export default function ListeClient() {
         <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500">
-              <th className="w-[20%] px-5 py-3">Nom</th>
-              <th className="w-[12%] px-5 py-3">Agence</th>
-              <th className="w-[12%] px-5 py-3">Zone</th>
-              <th className="w-[15%] px-5 py-3">Quartier</th>
-              <th className="w-[12%] px-5 py-3">Categorie</th>
-              <th className="w-[13%] px-5 py-3">Cree le</th>
-              <th className="w-[13%] px-5 py-3">Qr code</th>
-              <th className="w-[8%] px-5 py-3"></th>
+              <th className="w-[20%] px-2 py-3">Nom</th>
+              <th className="w-[12%] px-2 py-3">Agence</th>
+              <th className="w-[12%] px-2 py-3">Zone</th>
+              <th className="w-[15%] px-2 py-3">Quartier</th>
+              <th className="w-[12%] px-2 py-3">Categorie</th>
+              <th className="w-[13%] px-2 py-3">Cree le</th>
+              <th className="w-[13%] px-2 py-3">Avec Qr code</th>
+              <th className="w-[8%] px-2 py-3"></th>
             </tr>
           </thead>
           <tbody>
             {filteredClients.length === 0 ? (
               <tr>
-                <td className="px-5 py-8 text-center text-sm text-gray-500" colSpan={8}>
+                <td className="px-2 py-8 text-center text-sm text-gray-500" colSpan={8}>
                   No clients match the selected filters.
                 </td>
               </tr>
@@ -223,26 +223,26 @@ export default function ListeClient() {
               const quartierIntitule = getQuartierLabel(client.quartier);
               return (
                 <tr key={client.id} className="border-b border-gray-100 last:border-0">
-                  <td className="px-5 py-3 font-medium text-gray-900">{client.nom}</td>
-                  <td className="px-5 py-3 text-gray-500">{client.agence?.intitule ?? "—"}</td>
-                  <td className="px-5 py-3 text-gray-500">{client.zone ?? "—"}</td>
-                  <td className="px-5 py-3 text-gray-500">{quartierIntitule ?? "—"}</td>
-                  <td className="px-5 py-3 text-gray-500">
+                  <td className="px-2 py-3 font-medium text-gray-900">{client.nom}</td>
+                  <td className="px-2 py-3 text-gray-500">{client.agence?.intitule ?? "—"}</td>
+                  <td className="px-2 py-3 text-gray-500">{client.zone ?? "—"}</td>
+                  <td className="px-2 py-3 text-gray-500">{quartierIntitule ?? "—"}</td>
+                  <td className="px-2 py-3 text-gray-500">
                     {client.categorie_client?.intitule ?? "—"}
                   </td>
-                  <td className="px-5 py-3 text-gray-500">
+                  <td className="px-2 py-3 text-gray-500">
                     {client.created_at ? new Date(client.created_at).toLocaleDateString("fr-FR") : "—"}
                   </td>
-                  <td className="px-5 py-3">
+                  <td className="px-2 py-3">
                     <span
                       className={`rounded px-2 py-1 text-sm font-medium ${
                         client.status_qrcode ? "bg-green-200" : "bg-red-200"
                       }`}
                     >
-                      {client.status_qrcode ? "avec" : "sans"}
+                      {client.status_qrcode ? "Oui" : "Non"}
                     </span>
                   </td>
-                  <td className="px-5 py-3">
+                  <td className="px-2 py-3">
                     <button
                       type="button"
                       onClick={() => openQrCode(client.id)}
