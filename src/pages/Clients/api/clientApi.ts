@@ -38,7 +38,10 @@ export type ClientItem = {
 
 export async function getClients() {
   const { data } = await api.get<ClientItem[]>("/clients");
-  return data;
+
+  return [...data].sort((a, b) =>
+    a.nom.localeCompare(b.nom, "fr", { sensitivity: "base" })
+  );
 }
 
 // get client qr code 

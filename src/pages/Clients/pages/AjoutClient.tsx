@@ -26,7 +26,7 @@ export default function AjoutClient() {
   const [agences, setAgences] = useState<agencetItem[]>([]);
   const [categories, setCategories] = useState<categorieClientItem[]>([]);
   useEffect(() => {
-    const loadData = async () => {
+    const loadCategorieAgenceData = async () => {
       try {
         const [agencesData, categoriesData] = await Promise.all([
           getAgences(),
@@ -40,7 +40,7 @@ export default function AjoutClient() {
       }
     };
 
-    loadData();
+    loadCategorieAgenceData();
   }, []);
   const handleChange = (
     field: keyof typeof initialForm,
