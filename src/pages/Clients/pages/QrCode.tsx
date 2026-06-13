@@ -3,6 +3,9 @@ import { useOutletContext } from "react-router-dom";
 import type { ClientsContext } from "../Clients";
 import { getClientQrCode } from "../api/clientApi";
 
+const getQuartierLabel = (quartier: string | { intitule: string }) =>
+  typeof quartier === "object" ? quartier.intitule : quartier;
+
 export default function ClientQrCode() {
   const { clients, selectedClientId, setSelectedClientId } =
     useOutletContext<ClientsContext>();
@@ -120,7 +123,8 @@ export default function ClientQrCode() {
           <span className="font-medium text-gray-900">Zone:</span> {selectedClient.zone}
         </div>
         <div>
-          <span className="font-medium text-gray-900">Quartier:</span> {selectedClient.quartier}
+          <span className="font-medium text-gray-900">Quartier:</span>{" "}
+          {getQuartierLabel(selectedClient.quartier)}
         </div>
       </div>
     </div>

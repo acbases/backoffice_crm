@@ -10,5 +10,7 @@ export type categorieClientItem = {
 
 export async function getCategorieClients() {
   const { data } = await api.get<categorieClientItem[]>("/categorieClients");
-  return data;
+  return [...data].sort((a, b) =>
+    a.intitule.localeCompare(b.intitule, "fr", { sensitivity: "base" })
+  );
 }

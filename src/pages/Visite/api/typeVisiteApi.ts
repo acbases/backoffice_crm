@@ -10,7 +10,7 @@ export type TypeVisiteItem = {
 };
 
 export async function getTypeVisites() {
-  const { data } = await api.get<TypeVisiteItem[]>("/typeVisite");
+  const { data } = await api.get<TypeVisiteItem[]>("/typeVisites");
 
   return [...data].sort((a, b) =>
     a.nom.localeCompare(b.nom, "fr", { sensitivity: "base" })

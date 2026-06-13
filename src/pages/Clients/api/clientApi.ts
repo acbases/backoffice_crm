@@ -1,5 +1,10 @@
 import axios from "axios";
 // create client 
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? "",
+});
+
+// POST create client 
 export type ClientPayload = {
   nom: string;
   latitude: number;
@@ -14,26 +19,47 @@ export type ClientResponse = ClientPayload & {
   id: number;
 };
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? "",
-});
-
 export async function createClient(payload: ClientPayload) {
   const { data } = await api.post<ClientResponse>("/client", payload);
   return data;
 }
 
-// get clients and client
+// GET all clients 
+export type Agence = {
+  id: number;
+  intitule: string;
+  region: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
+export type CategorieClient = {
+  id: number;
+  intitule: string;
+  created_at: string | null;
+  updated_at: string | null;
+  statut: string;
+};
+
+export type Quartier = {
+  id: number;
+  intitule: string;
+};
+
 export type ClientItem = {
   id: number;
   nom: string;
   latitude: string;
   longitude: string;
   zone: string;
-  quartier: string;
+  quartier: Quartier | string;
   idagence: number;
   idcategorie: number;
   status_qrcode: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+  agence: Agence;
+  categorie_client: CategorieClient;
 };
 
 export async function getClients() {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { createVisite } from "../api/visiteApi";
@@ -11,7 +11,7 @@ const initialForm = {
     idutilisateur: "",
     idcategorie: "",
     date: "",
-    statut: 0,
+    statut: 0, // a confirmer 
     type: 0, // 0 planifié et 1 non 
     idtype: "",
     object: "",
@@ -39,7 +39,9 @@ export default function AjoutVisite() {
                 ]);
 
                 setClients(ClientsData);
-                setUtilisateurs(UsersData)
+                setUtilisateurs(UsersData);
+                setTypeVisites(TypeVisiteData)
+                setCategorieVisites(CategorieVisiteData)
             } catch (error) {
                 console.error("Erreur chargement listes :", error);
             }
@@ -68,8 +70,8 @@ export default function AjoutVisite() {
                 idutilisateur: Number(form.idutilisateur),
                 idcategorie: Number(form.idcategorie),
                 date: form.date,
-                statut: Number(form.statut),
-                type: Number(form.type),
+                statut: form.statut,
+                type: form.type,
                 idtype: Number(form.idtype),
                 object: form.object,
             });
@@ -174,6 +176,7 @@ export default function AjoutVisite() {
                         className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
                         type="date"
                         required
+                        min={new Date().toISOString().split("T")[0]}
                     />
                 </label>
             </div>

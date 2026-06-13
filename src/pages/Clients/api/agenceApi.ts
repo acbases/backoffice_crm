@@ -10,5 +10,7 @@ export type agencetItem = {
 
 export async function getAgences() {
   const { data } = await api.get<agencetItem[]>("/agences");
-  return data;
+  return [...data].sort((a, b) =>
+    a.intitule.localeCompare(b.intitule, "fr", { sensitivity: "base" })
+  );
 }

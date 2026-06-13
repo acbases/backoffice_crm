@@ -7,6 +7,8 @@ import {
   getCategorieClients,
   type categorieClientItem,
 } from "../api/categorieClientApi";
+import { getZones } from "../api/zoneApi";
+import { getQuartiers } from "../api/quartierApi";
 
 const initialForm = {
   nom: "",
@@ -25,16 +27,24 @@ export default function AjoutClient() {
   const [error, setError] = useState("");
   const [agences, setAgences] = useState<agencetItem[]>([]);
   const [categories, setCategories] = useState<categorieClientItem[]>([]);
+  const [zones, setZones] = useState<string[]>([]);
+  const [quartiers, setQuartiers] = useState<string[]>([]);
+
   useEffect(() => {
     const loadCategorieAgenceData = async () => {
       try {
-        const [agencesData, categoriesData] = await Promise.all([
-          getAgences(),
-          getCategorieClients(),
-        ]);
+        const [agencesData, categoriesData, zonesData, quartiersData] =
+          await Promise.all([
+            getAgences(),
+            getCategorieClients(),
+            getZones(),
+            getQuartiers(),
+          ]);
 
         setAgences(agencesData);
         setCategories(categoriesData);
+        setZones(zonesData);
+        setQuartiers(quartiersData);
       } catch (error) {
         console.error("Erreur chargement listes :", error);
       }
@@ -134,8 +144,14 @@ export default function AjoutClient() {
             onChange={(event) => handleChange("zone", event.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
             type="text"
+            list="zone-list"
             required
           />
+          <datalist id="zone-list">
+            {zones.map((zone) => (
+              <option key={zone} value={zone} />
+            ))}
+          </datalist>
         </label>
 
         <label className="block space-y-1">
@@ -145,14 +161,20 @@ export default function AjoutClient() {
             onChange={(event) => handleChange("quartier", event.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
             type="text"
+            list="quartier-list"
             required
           />
+          <datalist id="quartier-list">
+            {quartiers.map((quartier) => (
+              <option key={quartier} value={quartier} />
+            ))}
+          </datalist>
         </label>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block space-y-1">
-          <span className="text-sm font-medium text-gray-700">Id agence</span>
+          <span className="text-sm font-medium text-gray-700">Agence</span>
           <select
             value={form.idagence}
             onChange={(event) => handleChange("idagence", event.target.value)}
@@ -170,7 +192,7 @@ export default function AjoutClient() {
         </label>
 
         <label className="block space-y-1">
-          <span className="text-sm font-medium text-gray-700">Id categorie</span>
+          <span className="text-sm font-medium text-gray-700">Categorie</span>
           <select
             value={form.idcategorie}
             onChange={(event) => handleChange("idcategorie", event.target.value)}

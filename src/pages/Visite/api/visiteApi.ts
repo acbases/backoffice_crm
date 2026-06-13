@@ -21,6 +21,7 @@ const api = axios.create({
 });
 
 export async function createVisite(payload: VisitePayload) {
+  console.log(payload)
   const { data } = await api.post<VisiteResponse>("/visite", payload);
   return data;
 }

@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import type { VisitesContext } from "../Visite";
 import { getVisites } from "../api/visiteApi";
 
 function ListeVisite() {
-    const navigate = useNavigate();
-    const { visites, setVisites, selectedVisiteId, setSelectedVisiteId } =
+    const { visites, setVisites, setSelectedVisiteId } =
         useOutletContext<VisitesContext>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -29,7 +28,7 @@ function ListeVisite() {
             }
         };
         loadVisite();
-    }, [selectedVisiteId, setSelectedVisiteId]);
+    }, [setSelectedVisiteId]);
 
     if (loading)
         return (
