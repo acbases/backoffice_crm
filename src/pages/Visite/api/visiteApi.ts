@@ -73,6 +73,7 @@ export async function getVisiteById(id: string | number) {
   const { data } = await api.get<VisiteItem>(`/visite/${id}`);
   return data;
 }
+
 export async function getVisites() {
   const { data } = await api.get<VisiteItem[]>("/visite");
   return data;
