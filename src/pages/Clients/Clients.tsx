@@ -1,17 +1,36 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import type { ClientItem } from "./api/clientApi";
+import { getClients, type ClientItem } from "./api/clientApi";
 
 export type ClientsContext = {
   clients: ClientItem[];
   setClients: Dispatch<SetStateAction<ClientItem[]>>;
   selectedClientId: string;
   setSelectedClientId: (id: string) => void;
+  loadClients: () => Promise<void>;
+  loading: boolean;
 };
 
 export default function Clients() {
   const [clients, setClients] = useState<ClientItem[]>([]);
   const [selectedClientId, setSelectedClientId] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const loadClients = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getClients();
+      setClients(data);
+    } catch (error) {
+      console.error("Failed to load clients:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadClients();
+  }, [loadClients]);
 
   return (
     <div id="Clients-page" className="space-y-6">
@@ -48,7 +67,7 @@ export default function Clients() {
           Liste
         </NavLink>
         <NavLink
-          to="qr-code"
+          to={selectedClientId ? `${selectedClientId}/qr-code` : "qr-code"}
           className={({ isActive }) =>
             `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               isActive
@@ -67,6 +86,8 @@ export default function Clients() {
           setClients,
           selectedClientId,
           setSelectedClientId,
+          loadClients,
+          loading,
         }}
       />
     </div>

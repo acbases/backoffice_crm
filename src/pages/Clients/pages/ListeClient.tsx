@@ -20,26 +20,14 @@ const getQuartierLabel = (quartier: ClientItem["quartier"]) =>
 export default function ListeClient() {
   // client states
   const navigate = useNavigate();
-  const { clients, setClients, setSelectedClientId } =
+  const { clients, setSelectedClientId, loading, loadClients } =
     useOutletContext<ClientsContext>();
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  // loading clients 
-  useEffect(() => {
-    const loadClients = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const data = await getClients();
-        setClients(data);
-      } catch {
-        setError("Unable to load clients.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadClients();
-  }, [setClients]);
+
+  // Re-fetch if needed (e.g. if we want to ensure fresh data on mount)
+  // useEffect(() => {
+  //   loadClients();
+  // }, [loadClients]);
 
 
   // filters data state
@@ -133,8 +121,7 @@ export default function ListeClient() {
     [clients]
   );
   const openQrCode = (id: number) => {
-    setSelectedClientId(String(id));
-    navigate("../qr-code");
+    navigate(`../${id}/qr-code`);
   };
 
 

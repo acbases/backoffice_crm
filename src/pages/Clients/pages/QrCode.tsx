@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useParams, useNavigate } from "react-router-dom";
 import type { ClientsContext } from "../Clients";
 import { getClientQrCode, updateClient } from "../api/clientApi";
 
@@ -7,23 +7,34 @@ const getQuartierLabel = (quartier: string | { intitule: string }) =>
   typeof quartier === "object" ? quartier.intitule : quartier;
 
 export default function ClientQrCode() {
-  const { clients, selectedClientId, setSelectedClientId } =
+  const { idclient } = useParams<{ idclient: string }>();
+  const navigate = useNavigate();
+  const { clients, setSelectedClientId, loadClients, loading: clientsLoading } =
     useOutletContext<ClientsContext>();
   const [qrUrl, setQrUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [qrBlob, setQrBlob] = useState<Blob | null>(null);
+
+  // Sync selectedClientId with URL param
+  useEffect(() => {
+    if (idclient) {
+      setSelectedClientId(idclient);
+    }
+  }, [idclient, setSelectedClientId]);
 
   const selectedClient =
-    clients.find((client) => String(client.id) === selectedClientId) ??
-    clients[0] ??
+    clients.find((client) => String(client.id) === idclient) ??
     null;
 
+  // Handle case where qr-code is accessed without ID, redirect to first client if available
   useEffect(() => {
-    if (!selectedClientId && clients[0]) {
-      setSelectedClientId(String(clients[0].id));
+    if (!idclient && clients.length > 0) {
+      navigate(`../${clients[0].id}/qr-code`, { replace: true });
     }
-  }, [clients, selectedClientId, setSelectedClientId]);
+  }, [idclient, clients, navigate]);
 
+  //loading qr code of the client
   useEffect(() => {
     if (!selectedClient) {
       setQrUrl("");
@@ -72,8 +83,6 @@ export default function ClientQrCode() {
     };
   }, [selectedClient]);
 
-  const [qrBlob, setQrBlob] = useState<Blob | null>(null);
-
   const handleDownload = () => {
     if (!qrBlob || !selectedClient) return;
     const url = URL.createObjectURL(qrBlob);
@@ -92,14 +101,26 @@ export default function ClientQrCode() {
     if (!selectedClient || activating || selectedClient.status_qrcode) return;
     setActivating(true);
     try {
-      const updated = await updateClient(selectedClient.id, { status_qrcode: true });
-      setSelectedClientId(String(updated.id));
+      await updateClient(selectedClient.id, { status_qrcode: true });
+      await loadClients(); // This "refreshes" the data
     } catch (err) {
       console.error("Failed to activate QR code status:", err);
     } finally {
       setActivating(false);
     }
   };
+
+  const handleClientChange = (clientId: string) => {
+    navigate(`../${clientId}/qr-code`);
+  };
+
+  if (clientsLoading && clients.length === 0) {
+    return (
+      <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-500">
+        Loading clients...
+      </div>
+    );
+  }
 
   if (!selectedClient) {
     return (
@@ -122,7 +143,7 @@ export default function ClientQrCode() {
         <span className="text-sm font-medium text-gray-700">Choisir un client</span>
         <select
           value={String(selectedClient.id)}
-          onChange={(event) => setSelectedClientId(event.target.value)}
+          onChange={(event) => handleClientChange(event.target.value)}
           className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
         >
           {clients.map((client) => (

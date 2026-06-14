@@ -20,6 +20,7 @@ export default function App() {
             <Route path="ajout" element={<AjoutClient />} />
             <Route path="liste" element={<ListeClient />} />
             <Route path="qr-code" element={<ClientQrCode />} />
+            <Route path=":idclient/qr-code" element={<ClientQrCode />} />
           </Route>
           <Route path="visite" element={<Visite />} >
             <Route index element={<Navigate to="ajout" replace />} />
