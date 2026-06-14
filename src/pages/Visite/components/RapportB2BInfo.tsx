@@ -155,8 +155,7 @@ function RapportB2BInfo({
                         </div>
 
                         <img
-                            // src={rapport.sary}
-                            src={"http://localhost:8000/storage/rapportB2B/files/nVmB26arTfETapyLtQaoueeqHo2b5xUWVx7o0e3y.png"}
+                            src={rapport.sary}
                             alt="Rapport"
                             className="rounded-lg border max-h-96 object-cover"
                         />
