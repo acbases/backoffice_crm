@@ -4,22 +4,27 @@ import type { categorieClientItem } from "../api/categorieClientApi";
 type FilterValue = string;
 
 type ClientFiltersProps = {
-  qrCodeFilter: FilterValue;
-  setQrCodeFilter: (value: FilterValue) => void;
   agenceFilter: FilterValue;
   setAgenceFilter: (value: FilterValue) => void;
+  agenceOptions: agencetItem[];
+
   zoneFilter: FilterValue;
+  zoneOptions: string[];
   setZoneFilter: (value: FilterValue) => void;
+
   quartierFilter: FilterValue;
   setQuartierFilter: (value: FilterValue) => void;
+  quartierOptions: string[];
+
   categorieFilter: FilterValue;
   setCategorieFilter: (value: FilterValue) => void;
+  categorieOptions: categorieClientItem[];
+
   nomFilter: FilterValue;
   setNomFilter: (value: FilterValue) => void;
-  agenceOptions: agencetItem[];
-  zoneOptions: string[];
-  quartierOptions: string[];
-  categorieOptions: categorieClientItem[];
+
+  qrCodeFilter: FilterValue;
+  setQrCodeFilter: (value: FilterValue) => void;
   totalCount: number;
   withQrCodeCount: number;
   withoutQrCodeCount: number;

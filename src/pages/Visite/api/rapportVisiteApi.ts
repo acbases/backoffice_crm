@@ -32,7 +32,7 @@ export async function getRapportB2BByIdVisite(idVisite: number) {
     `/getRapportB2BByIdVisite/${idVisite}`
   );
 
-  return data[0];
+  return data.length > 0 ? data[0] : null;
 }
 
 /* =========================
@@ -59,7 +59,7 @@ export async function getVueRapportProduitsByIdVisite(
     `/getVueRapportProduitsByIdVisite/${idVisite}`
   );
 
-  return data;
+  return data ?? [];
 }
 
 /* =========================
@@ -85,7 +85,7 @@ export async function getVueRapportAutresProduitsByIdVisite(
     `/getVueRapportAutresProduitsByIdVisite/${idVisite}`
   );
 
-  return data;
+ return data ?? [];
 }
 
 /* =========================
@@ -105,14 +105,14 @@ export async function getVueRapportPlvByIdVisite(
     `/getVueRapportPlvByIdVisite/${idVisite}`
   );
 
-  return data;
+  return data ?? [];
 }
 
 /* =========================
-   Rapport
+   Rapport retail
 ========================= */
 
-export type RapportItem = {
+export type RapportRetailItem = {
   id: number;
   idvisite: number;
   description: string;
@@ -121,12 +121,12 @@ export type RapportItem = {
   updated_at: string | null;
 };
 
-export async function getRapportByIdVisite(
+export async function getRapportRetailByIdVisite(
   idVisite: number
 ) {
-  const { data } = await api.get<RapportItem[]>(
+  const { data } = await api.get<RapportRetailItem[]>(
     `/getRapportByIdVisite/${idVisite}`
   );
 
-  return data;
+  return data.length > 0 ? data[0] : null;
 }

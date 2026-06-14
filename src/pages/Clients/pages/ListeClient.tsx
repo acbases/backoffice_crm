@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import type { ClientsContext } from "../Clients";
 import ClientFilters from "../components/ClientFilters";
+import { getClients, type ClientItem } from "../api/clientApi";
+
 import { getAgences, type agencetItem } from "../api/agenceApi";
 import { getCategorieClients, type categorieClientItem } from "../api/categorieClientApi";
-import { getClients, type ClientItem } from "../api/clientApi";
 import { getQuartiers } from "../api/quartierApi";
 import { getZones } from "../api/zoneApi";
 
@@ -17,16 +18,13 @@ const getQuartierLabel = (quartier: ClientItem["quartier"]) =>
   typeof quartier === "object" ? quartier.intitule : quartier;
 
 export default function ListeClient() {
+  // client states
   const navigate = useNavigate();
   const { clients, setClients, setSelectedClientId } =
     useOutletContext<ClientsContext>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [agenceOptions, setAgenceOptions] = useState<agencetItem[]>([]);
-  const [zoneOptions, setZoneOptions] = useState<string[]>([]);
-  const [quartierOptions, setQuartierOptions] = useState<string[]>([]);
-  const [categorieOptions, setCategorieOptions] = useState<categorieClientItem[]>([]);
-
+  // loading clients 
   useEffect(() => {
     const loadClients = async () => {
       setLoading(true);
@@ -34,11 +32,6 @@ export default function ListeClient() {
       try {
         const data = await getClients();
         setClients(data);
-        if (!data.length) {
-          setSelectedClientId("");
-          return;
-        }
-        setSelectedClientId(String(data[0].id));
       } catch {
         setError("Unable to load clients.");
       } finally {
@@ -46,8 +39,15 @@ export default function ListeClient() {
       }
     };
     loadClients();
-  }, [setClients, setSelectedClientId]);
+  }, [setClients]);
 
+
+  // filters data state
+  const [agenceOptions, setAgenceOptions] = useState<agencetItem[]>([]);
+  const [zoneOptions, setZoneOptions] = useState<string[]>([]);
+  const [quartierOptions, setQuartierOptions] = useState<string[]>([]);
+  const [categorieOptions, setCategorieOptions] = useState<categorieClientItem[]>([]);
+  // loading filters
   useEffect(() => {
     const loadFilters = async () => {
       try {
@@ -69,14 +69,14 @@ export default function ListeClient() {
 
     loadFilters();
   }, []);
-
+  // filter values states
   const [qrCodeFilter, setQrCodeFilter] = useState<QrCodeFilter>("all");
   const [agenceFilter, setAgenceFilter] = useState("");
   const [zoneFilter, setZoneFilter] = useState("");
   const [quartierFilter, setQuartierFilter] = useState("");
   const [categorieFilter, setCategorieFilter] = useState("");
   const [nomFilter, setNomFilter] = useState("");
-
+  // client filter handling
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
       if (qrCodeFilter === "with" && !client.status_qrcode) {
@@ -91,7 +91,7 @@ export default function ListeClient() {
         normalizeText(client.agence?.intitule) !== normalizeText(agenceFilter)
       ) {
         return false;
-      }
+      }       
 
       if (zoneFilter && normalizeText(client.zone) !== normalizeText(zoneFilter)) {
         return false;
@@ -122,6 +122,8 @@ export default function ListeClient() {
     });
   }, [agenceFilter, categorieFilter, clients, qrCodeFilter, quartierFilter, zoneFilter, nomFilter]);
 
+
+  // qr code counts and open qr code 
   const withQrCodeCount = useMemo(
     () => clients.filter((client) => client.status_qrcode).length,
     [clients]
@@ -130,12 +132,13 @@ export default function ListeClient() {
     () => clients.filter((client) => !client.status_qrcode).length,
     [clients]
   );
-
   const openQrCode = (id: number) => {
     setSelectedClientId(String(id));
     navigate("../qr-code");
   };
 
+
+  // use to display name on the mobile 
   const getInitials = (nom: string) =>
     nom
       .split(" ")
@@ -144,6 +147,8 @@ export default function ListeClient() {
       .join("")
       .toUpperCase();
 
+
+  // display handling with error
   if (loading)
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-500">
@@ -172,6 +177,7 @@ export default function ListeClient() {
           <h2 className="text-lg font-semibold text-gray-900">Liste des clients</h2>
         </div>
 
+        {/* filters ui component */}
         <div className="mt-4">
           <ClientFilters
             qrCodeFilter={qrCodeFilter}
@@ -197,6 +203,7 @@ export default function ListeClient() {
         </div>
       </div>
 
+      {/* desktop laptop view */}
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
           <thead>
@@ -273,7 +280,7 @@ export default function ListeClient() {
         </table>
       </div>
 
-            {/* mobile view */}
+      {/* mobile view */}
       <div className="flex flex-col gap-3 p-4 md:hidden">
         {filteredClients.length === 0 ? (
           <div className="rounded-xl border border-dashed border-gray-300 bg-white p-4 text-sm text-gray-500">

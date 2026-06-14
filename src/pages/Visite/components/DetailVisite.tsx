@@ -1,25 +1,82 @@
-import { X, Calendar, User, MapPin, Tag, Info } from "lucide-react";
+import { X } from "lucide-react";
+import VisiteInfo from "./VisiteInfo";
+import RapportB2BInfo from "./RapportB2BInfo"
 import { useEffect, useState } from "react";
-import { getVisiteById, type VisiteItem } from "../api/visiteApi";
-
+import {
+    getVisiteById,
+    type VisiteItem
+} from "../api/visiteApi";
+import {
+    type RapportB2BItem,
+    getRapportB2BByIdVisite,
+    type VueRapportProduitItem,
+    getVueRapportProduitsByIdVisite,
+    type VueRapportAutreProduitItem,
+    getVueRapportAutresProduitsByIdVisite,
+    type VueRapportPlvItem,
+    getVueRapportPlvByIdVisite,
+    type RapportRetailItem,
+    getRapportRetailByIdVisite
+} from "../api/rapportVisiteApi";
+import RapportViewAndRetailInfo from "./RapportViewAndRetailInfo";
 interface DetailVisiteProps {
     id: string;
     onClose: () => void;
 }
 
 function DetailVisite({ id, onClose }: DetailVisiteProps) {
+    // visite
     const [selectedVisite, setSelectedVisite] = useState<VisiteItem | null>(null);
     const [loading, setLoading] = useState(true);
+
+    // rapport b2b
+    const [rapportB2B, setRapportB2B] = useState<RapportB2BItem | null>(null);
+    const [vueRapportProduits, setVueRapportProduits] = useState<VueRapportProduitItem[]>([]);
+    const [vueRapportAutresProduits, setVueRapportAutresProduits] = useState<VueRapportAutreProduitItem[]>([]);
+    const [vueRapportPlv, setVueRapportPlv] = useState<VueRapportPlvItem[]>([]);
+    const [rapportRetail, setRapportRetail] = useState<RapportRetailItem | null>(null);
+
+    const [loadingRapportB2B, setLoadingRapportB2B] = useState(true);
+    const [loadingVueRapportProduits, setLoadingVueRapportProduits] = useState(true);
+    const [loadingVueRapportAutresProduits, setLoadingVueRapportAutresProduits] = useState(true);
+    const [loadingVueRapportPlv, setLoadingVueRapportPlv] = useState(true);
+    const [loadingRapportRetail, setLoadingRapportRetail] = useState(true);
 
     useEffect(() => {
         const fetchVisite = async () => {
             try {
                 const data = await getVisiteById(id);
                 setSelectedVisite(data);
+
+                const [
+                    rapportB2BData,
+                    rapportProduitsData,
+                    rapportAutresProduitsData,
+                    rapportPlvData,
+                    rapportRetailData,
+                ] = await Promise.all([
+                    getRapportB2BByIdVisite(data.id),
+                    getVueRapportProduitsByIdVisite(data.id),
+                    getVueRapportAutresProduitsByIdVisite(data.id),
+                    getVueRapportPlvByIdVisite(data.id),
+                    getRapportRetailByIdVisite(data.id),
+                ]);
+
+                setRapportB2B(rapportB2BData);
+                setVueRapportProduits(rapportProduitsData);
+                setVueRapportAutresProduits(rapportAutresProduitsData);
+                setVueRapportPlv(rapportPlvData);
+                setRapportRetail(rapportRetailData);
+
             } catch (error) {
                 console.error("Erreur lors du chargement de la visite :", error);
             } finally {
                 setLoading(false);
+                setLoadingRapportB2B(false);
+                setLoadingVueRapportProduits(false);
+                setLoadingVueRapportAutresProduits(false);
+                setLoadingVueRapportPlv(false);
+                setLoadingRapportRetail(false);
             }
         };
 
@@ -66,142 +123,27 @@ function DetailVisite({ id, onClose }: DetailVisiteProps) {
 
             {/* Content */}
             <div className="flex">
-                {/* detail de la visite  */}
-                <div className="flex flex-col overflow-y-auto p-6 space-y-6">
-                    {/* Objet */}
-                    <div className="bg-white border rounded-xl p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Info size={18} className="text-blue-500" />
-                            <h3 className="font-semibold">Objectif</h3>
-                        </div>
+                {/* visite detail */}
+                <VisiteInfo visite={selectedVisite} />
 
-                        <p className="text-gray-700">
-                            {selectedVisite.object || "Aucun objet renseigné"}
-                        </p>
-                    </div>
-
-                    {/* Informations visite */}
-                    <div className="bg-white border rounded-xl p-4">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Calendar size={18} className="text-green-500" />
-                            <h3 className="font-semibold">Informations visite</h3>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <p className="text-gray-500">Date</p>
-                                <p className="font-medium">
-                                    {new Date(selectedVisite.date).toLocaleDateString(
-                                        "fr-FR"
-                                    )}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-gray-500">Type de visite</p>
-                                <p className="font-medium">
-                                    {selectedVisite?.type_visite?.nom || "Non renseigné"}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-gray-500">Catégorie</p>
-                                <p className="font-medium">
-                                    {selectedVisite?.categorie_visite?.intitule ?? "-"}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-gray-500">Statut</p>
-                                <p className="font-medium">
-                                    {/* a confirmer a Teddy */}
-                                    {selectedVisite?.statut ?? "-"} 
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Client */}
-                    <div className="bg-white border rounded-xl p-4">
-                        <div className="flex items-center gap-2 mb-4">
-                            <MapPin size={18} className="text-red-500" />
-                            <h3 className="font-semibold">Client</h3>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <p className="text-gray-500">Nom</p>
-                                <p className="font-medium">
-                                    {selectedVisite?.client?.nom ?? "-"}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-gray-500">Zone</p>
-                                <p className="font-medium">
-                                    {selectedVisite?.client?.zone ?? "-"}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-gray-500">Quartier</p>
-                                <p className="font-medium">
-                                    {selectedVisite?.client?.quartier ?? "-"}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-gray-500">Catégorie client</p>
-                                <p className="font-medium">
-                                    {selectedVisite?.client?.categorie_client?.intitule ?? "-"}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Commercial */}
-                    <div className="bg-white border rounded-xl p-4">
-                        <div className="flex items-center gap-2 mb-4">
-                            <User size={18} className="text-purple-500" />
-                            <h3 className="font-semibold">Commercial</h3>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <p className="text-gray-500">Nom</p>
-                                <p className="font-medium">
-                                    {selectedVisite?.utilisateur?.firstname ?? ""}
-                                    {" "}
-                                    {selectedVisite?.utilisateur?.name ?? ""}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-gray-500">Matricule</p>
-                                <p className="font-medium">
-                                    {selectedVisite?.utilisateur?.matricule ?? "-"}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-gray-500">Email</p>
-                                <p className="font-medium">
-                                    {selectedVisite?.utilisateur?.email ?? "-"}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-gray-500">Rôle CRM</p>
-                                <p className="font-medium">
-                                    {selectedVisite?.utilisateur?.role_crm ?? "-"}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    rapport detail
-                </div>
+                {/* report detail */}
+                {rapportB2B ? (
+                    <RapportB2BInfo
+                        rapport={rapportB2B}
+                        loading={loadingRapportB2B}
+                    />
+                ) : (
+                    <RapportViewAndRetailInfo
+                        vueRapportProduits={vueRapportProduits}
+                        vueRapportAutresProduits={vueRapportAutresProduits}
+                        vueRapportPlv={vueRapportPlv}
+                        rapportRetail={rapportRetail}
+                        loadingVueRapportProduits={loadingVueRapportProduits}
+                        loadingVueRapportAutresProduits={loadingVueRapportAutresProduits}
+                        loadingVueRapportPlv={loadingVueRapportPlv}
+                        loadingRapportRetail={loadingRapportRetail}
+                    />
+                )}
             </div>
 
             {/* Footer */}
