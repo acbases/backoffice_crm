@@ -213,9 +213,9 @@ export default function AjoutClient() {
       <button
         type="submit"
         disabled={loading}
-        className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
+        className="rounded-lg bg-green-200 px-4 py-2 text-sm font-medium hover:bg-green-300 disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {loading ? "Saving..." : "Save client"}
+        {loading ? "En cours..." : "Enregistrer client"}
       </button>
     </form>
   );

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-  Menu, 
-  X, 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  Menu,
+  X,
+  ChevronLeft,
+  ChevronRight,
   UserStar,
   MapPinPen
 } from "lucide-react";
@@ -26,8 +26,8 @@ const NavItem = ({ item, isCollapsed, onClick }: NavItemProps) => (
     to={item.path}
     className={({ isActive }) => `
       flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200
-      ${isActive 
-        ? "bg-red-50 text-red-600 font-semibold" 
+      ${isActive
+        ? "bg-red-50 text-red-600 font-semibold"
         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}
     `}
     onClick={onClick}
@@ -68,8 +68,8 @@ export default function Layout() {
 
   const navItems = [
     // { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-    { name: "Client", path: "/client/ajout", icon: UserStar },
-    { name: "Visite", path: "/visite/ajout", icon: MapPinPen },
+    { name: "Client", path: "/client", icon: UserStar },
+    { name: "Visite", path: "/visite", icon: MapPinPen },
   ];
 
   const sidebarVariants = {
@@ -80,7 +80,7 @@ export default function Layout() {
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50 font-sans" id="layout-root">
       {/* Mobile Header */}
-      <header 
+      <header
         className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center px-4 z-40"
         id="mobile-header"
       >
@@ -105,7 +105,7 @@ export default function Layout() {
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 shrink-0">
           {!isSidebarOpen ? (
             <div className="w-full flex justify-center">
-               <span className="text-xl font-bold text-red-600">CRM</span>
+              <span className="text-xl font-bold text-red-600">CRM</span>
             </div>
           ) : (
             <span className="text-xl font-bold text-red-600 ml-2">CRM ADMIN</span>
@@ -114,10 +114,10 @@ export default function Layout() {
 
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => (
-            <NavItem 
-              key={item.path} 
-              item={item} 
-              isCollapsed={!isSidebarOpen} 
+            <NavItem
+              key={item.path}
+              item={item}
+              isCollapsed={!isSidebarOpen}
             />
           ))}
         </nav>
@@ -129,6 +129,26 @@ export default function Layout() {
         >
           {isSidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
         </button>
+        {isSidebarOpen ?
+          <footer className="flex justify-center w-full">
+            <a
+              href="https://allpro.alphaciment.com/allpro/home.php"
+              className="m-2 mb-4 inline-flex justify-center items-center text-center px-6 py-3 bg-yellow-200 hover:bg-yellow-300 font-semibold rounded-lg shadow-md transition duration-200"
+            >
+              Retour vers Allpro
+            </a>
+          </footer>
+          :
+          <footer className="flex justify-center w-full">
+            <a
+              href="https://allpro.alphaciment.com/allpro/home.php"
+              className="m-2 mb-4 inline-flex justify-center items-center text-center px-2 py-1 bg-yellow-200 hover:bg-yellow-300 font-semibold rounded-lg shadow-md transition duration-200"
+            >
+              Allpro
+            </a>
+          </footer>
+        }
+
       </motion.aside>
 
       {/* Mobile Sidebar Overlay */}
@@ -153,8 +173,8 @@ export default function Layout() {
             >
               <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200 shrink-0">
                 <span className="text-xl font-bold text-red-600">My App</span>
-                <button 
-                  onClick={() => setIsMobileMenuOpen(false)} 
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className="p-2 -mr-2 rounded-lg hover:bg-gray-100 transition-colors"
                   id="mobile-sidebar-close"
                 >
@@ -163,21 +183,29 @@ export default function Layout() {
               </div>
               <nav className="flex-1 p-6 space-y-4 overflow-y-auto">
                 {navItems.map((item) => (
-                  <NavItem 
-                    key={item.path} 
-                    item={item} 
-                    isCollapsed={false} 
+                  <NavItem
+                    key={item.path}
+                    item={item}
+                    isCollapsed={false}
                     onClick={() => setIsMobileMenuOpen(false)}
                   />
                 ))}
               </nav>
+              <footer className="flex justify-center w-full">
+                <a
+                  href="https://allpro.alphaciment.com/allpro/home.php"
+                  className="m-2 mb-4 inline-flex justify-center items-center text-center px-6 py-3 bg-yellow-200 hover:bg-yellow-300 font-semibold rounded-lg shadow-md transition duration-200"
+                >
+                  Retour vers Allpro
+                </a>
+              </footer>
             </motion.aside>
           </>
         )}
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <main 
+      <main
         className="flex-1 flex flex-col min-w-0 overflow-y-auto"
         id="main-content"
       >
@@ -185,6 +213,7 @@ export default function Layout() {
           <Outlet />
         </div>
       </main>
+
     </div>
   );
 }

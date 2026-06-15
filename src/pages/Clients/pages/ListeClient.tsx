@@ -240,7 +240,7 @@ export default function ListeClient() {
                     <button
                       type="button"
                       onClick={() => openQrCode(client.id)}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-black"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-200 px-3 py-1.5 text-xs font-medium hover:bg-yellow-300"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

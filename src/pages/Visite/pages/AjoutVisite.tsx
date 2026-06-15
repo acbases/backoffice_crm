@@ -223,9 +223,9 @@ export default function AjoutVisite() {
             <button
                 type="submit"
                 disabled={loading}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
+                className="rounded-lg bg-green-200 px-4 py-2 text-sm font-medium hover:bg-green-300 disabled:cursor-not-allowed disabled:opacity-70"
             >
-                {loading ? "Saving..." : "Save visite"}
+                {loading ? "En cours..." : "Enregistrer visite"}
             </button>
         </form>
     )

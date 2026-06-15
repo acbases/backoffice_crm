@@ -325,7 +325,7 @@ function ListeVisite() {
                                     <button
                                         type="button"
                                         onClick={() => openVisite(visite.id)}
-                                        className="rounded-lg bg-gray-900 px-4 py-1.5 text-xs font-medium text-white hover:bg-black whitespace-nowrap"
+                                        className="rounded-lg bg-yellow-200 px-4 py-1.5 text-xs font-medium hover:bg-yellow-300 whitespace-nowrap"
                                     >
                                         Voir
                                     </button>
@@ -393,7 +393,7 @@ function ListeVisite() {
                             <button
                                 type="button"
                                 onClick={() => openVisite(visite.id)}
-                                className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black"
+                                className="rounded-lg bg-yellow-200 px-4 py-2 text-sm font-medium hover:bg-yellow-300"
                             >
                                 Voir détails
                             </button>
