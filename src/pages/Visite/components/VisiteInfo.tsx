@@ -60,10 +60,31 @@ function VisiteInfo({ visite }: VisiteInfoProps) {
                     </div>
 
                     <div>
-                        <p className="text-gray-500">Statut</p>
-                        <p className="font-medium">
-                            {visite?.statut ?? "-"}
-                        </p>
+                        <p className="text-gray-500">Statut</p>                
+                        {(() => {
+                            // 1. Determine the status conditions
+                            const isPast = visite.date ? new Date(visite.date) < new Date() : false;
+                            const isOverdue = visite.statut === 0 && isPast;
+
+                            // 2. Assign classes based on status
+                            let badgeClass = "bg-yellow-100 text-yellow-700"; // Default: A venir
+                            let statusText = "A venir";
+
+                            if (visite.statut === 1) {
+                                badgeClass = "bg-green-100 text-green-700";
+                                statusText = "Terminée";
+                            } else if (isOverdue) {
+                                badgeClass = "bg-red-100 text-red-700";
+                                statusText = "En retard";
+                            }
+
+                            // 3. Render the badge
+                            return (
+                                <p className="font-medium">
+                                    {statusText}
+                                </p>
+                            );
+                        })()}
                     </div>
                 </div>
             </div>

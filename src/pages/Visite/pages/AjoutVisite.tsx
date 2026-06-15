@@ -124,7 +124,7 @@ export default function AjoutVisite() {
 
                 <label className="block space-y-1">
                     <span className="text-sm font-medium text-gray-700">
-                        Responsable commercial
+                        Utilisateur
                     </span>
                     <select
                         value={form.idutilisateur}
@@ -132,7 +132,7 @@ export default function AjoutVisite() {
                         className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
                         required
                     >
-                        <option value="">Sélectionner un responsable</option>
+                        <option value="">Sélectionner un utilisateur</option>
 
                         {utilisateurs.map((user) => (
                             <option key={user.id} value={user.id}>
