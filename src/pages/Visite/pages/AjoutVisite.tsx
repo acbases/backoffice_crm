@@ -77,7 +77,8 @@ export default function AjoutVisite() {
             });
 
             setForm(initialForm);
-            navigate("../liste");
+            // navigate("../liste");
+            window.location.href = "/crm_admin/visite/liste";
         } catch {
             setError("Unable to save the visite.");
         } finally {

@@ -76,7 +76,8 @@ export default function AjoutClient() {
       });
 
       setForm(initialForm);
-      navigate("../liste");
+      // navigate("../liste");
+      window.location.href = "/crm_admin/client/liste";
     } catch {
       setError("Unable to save the client.");
     } finally {
