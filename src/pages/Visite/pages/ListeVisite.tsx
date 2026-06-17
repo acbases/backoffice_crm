@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "motion/react";
 import type { VisitesContext } from "../Visite";
 import { getVisites } from "../api/visiteApi";
 import DetailVisite from "../components/DetailVisite";
+import ListeVisiteMobile from "../components/ListeVisiteMobile";
+import { getFilteredVisites } from "../utils/FilteredVisites";
 
 //filters
 import { type ClientItem, getClients } from "@/pages/Clients/api/clientApi";
@@ -13,9 +15,6 @@ import { getTypeVisites, type TypeVisiteItem } from "../api/typeVisiteApi";
 import { getCategorieVisites, type CategorieVisiteItem } from "../api/categorieVisiteApi";
 import { getZones } from "@/pages/Clients/api/zoneApi";
 import { getQuartiers } from "@/pages/Clients/api/quartierApi";
-
-const normalizeText = (value: string | null | undefined) =>
-    (value ?? "").trim().toLowerCase();
 
 function ListeVisite() {
     // visites states
@@ -85,75 +84,25 @@ function ListeVisite() {
     const [zoneFilter, setZoneFilter] = useState("")
     const [quartierFilter, setQuartierFilter] = useState("")
     const [statutFilter, setStatutFilter] = useState("")
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+
     // visite filter handling 
     const filteredVisites = useMemo(() => {
-        return visites.filter((vis) => {
+        const filtered = getFilteredVisites(visites, {
+            clientsFilter,
+            usersFilter,
+            planifiedFilter,
+            typeVisiteFilter,
+            categorieVisiteFilter,
+            zoneFilter,
+            quartierFilter,
+            statutFilter
+        });
 
-            if (clientsFilter) {
-                const regex = new RegExp(clientsFilter.trim().split(/\s+/).join(".*"), "i");
-                if (!regex.test(normalizeText(vis.client?.nom))) {
-                    return false;
-                }
-            }
-
-            if (usersFilter) {
-                const userFullName = `${vis.utilisateur?.firstname ?? ""} ${vis.utilisateur?.name ?? ""}`.trim();
-                const regex = new RegExp(usersFilter.trim().split(/\s+/).join(".*"), "i");
-                if (!regex.test(normalizeText(userFullName))) {
-                    return false;
-                }
-            }
-
-            if (planifiedFilter !== "") {
-                if (vis.type !== Number(planifiedFilter)) {
-                    return false;
-                }
-            }
-
-            if (typeVisiteFilter !== "") {
-                if (vis.idtype !== Number(typeVisiteFilter)) {
-                    return false;
-                }
-            }
-
-            if (categorieVisiteFilter !== "") {
-                if (vis.categorie_visite?.id !== Number(categorieVisiteFilter)) {
-                    return false;
-                }
-            }
-
-            if (zoneFilter !== "") {
-                if (vis.client?.zone !== zoneFilter) {
-                    return false;
-                }
-            }
-
-            if (quartierFilter !== "") {
-                if (vis.client?.quartier !== quartierFilter) {
-                    return false;
-                }
-            }
-
-            if (statutFilter !== "") {
-                const isPast = vis.date ? new Date(vis.date) < new Date() : false;
-                const isOverdue = vis.statut === 0 && isPast;
-
-                let currentStatus = "A venir";
-                if (vis.statut === 1) {
-                    currentStatus = "Terminée";
-                } else if (isOverdue) {
-                    currentStatus = "En retard";
-                }
-
-                if (currentStatus !== statutFilter) {
-                    return false;
-                }
-            }
-
-
-            return true  
-        })
-    }, [visites, clientsFilter, usersFilter, planifiedFilter, typeVisiteFilter, categorieVisiteFilter, zoneFilter, quartierFilter, statutFilter])
+        return filtered.sort((a, b) => {
+            return sortOrder === "asc" ? a.id - b.id : b.id - a.id;
+        });
+    }, [visites, clientsFilter, usersFilter, planifiedFilter, typeVisiteFilter, categorieVisiteFilter, zoneFilter, quartierFilter, statutFilter, sortOrder])
 
 
     // handling modal 
@@ -237,7 +186,17 @@ function ListeVisite() {
                 <table className="w-full text-sm ml-2">
                     <thead>
                         <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500">
-                            <th className="px-1 py-3">Id</th>
+                            <th className="px-1 py-3">
+                                <button
+                                    onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                                    className="flex items-center gap-1 hover:text-gray-900 transition-colors"
+                                >
+                                    Id
+                                    <span className="text-[10px]">
+                                        {sortOrder === "asc" ? "▲" : "▼"}
+                                    </span>
+                                </button>
+                            </th>
                             <th className="px-1 py-3">Client</th>
                             <th className="px-1 py-3">Utilisateur</th>
                             <th className="px-1 py-3">Planifiée</th>
@@ -337,70 +296,11 @@ function ListeVisite() {
             </div>
 
             {/* ── Mobile cards ── */}
-            <div className="flex flex-col gap-3 p-4 md:hidden">
-                {filteredVisites.map((visite) => (
-                    <div
-                        key={visite.id}
-                        className="rounded-xl border border-gray-200 bg-white p-4"
-                    >
-                        <div className="mb-3 flex items-start justify-between gap-2">
-                            <span className="font-medium text-gray-900">
-                                {visite.client?.nom ?? "Client inconnu"}
-                            </span>
-                            <span
-                                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${visite.statut === 1
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-yellow-100 text-yellow-700"
-                                    }`}
-                            >
-                                {visite.statut === 1 ? "Terminée" : "En attente"}
-                            </span>
-                        </div>
-
-                        <div className="mb-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                            <div>
-                                <p className="text-xs text-gray-400">Type</p>
-                                <p className="text-gray-700">
-                                    {visite.type_visite?.nom ?? "—"}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-gray-400">Catégorie</p>
-                                <p className="text-gray-700">
-                                    {visite.categorie_visite?.intitule ?? "—"}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-gray-400">Zone</p>
-                                <p className="text-gray-700">
-                                    {visite.client?.zone ?? "—"} –{" "}
-                                    {visite.client?.quartier ?? "—"}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-gray-400">Date</p>
-                                <p className="text-gray-700">
-                                    {visite.date ? formatDate(visite.date) : "—"}
-                                </p>
-                            </div>
-                            <div className="col-span-2">
-                                <p className="text-xs text-gray-400">Objet</p>
-                                <p className="text-gray-700">{visite.object ?? "—"}</p>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-end">
-                            <button
-                                type="button"
-                                onClick={() => openVisite(visite.id)}
-                                className="rounded-lg bg-yellow-200 px-4 py-2 text-sm font-medium hover:bg-yellow-300"
-                            >
-                                Voir détails
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            <ListeVisiteMobile
+                visites={filteredVisites}
+                onOpenVisite={openVisite}
+                formatDate={formatDate}
+            />
 
             {/* Modal */}
             <AnimatePresence>
