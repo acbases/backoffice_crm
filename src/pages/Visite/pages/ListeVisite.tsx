@@ -16,6 +16,9 @@ import { getCategorieVisites, type CategorieVisiteItem } from "../api/categorieV
 import { getZones } from "@/pages/Clients/api/zoneApi";
 import { getQuartiers } from "@/pages/Clients/api/quartierApi";
 
+
+
+
 function ListeVisite() {
     // visites states
     const { visites, setVisites } =
@@ -66,7 +69,7 @@ function ListeVisite() {
                 setClientsOptions(clients)
                 setUsersOptions(users)
                 setTypeVisiteOptions(typeVisites),
-                setCategorieVisiteOptions(categorieVisites)
+                    setCategorieVisiteOptions(categorieVisites)
                 setZoneOptions(zones)
                 setQuartierOptions(quartiers)
             } catch {
@@ -84,8 +87,62 @@ function ListeVisite() {
     const [zoneFilter, setZoneFilter] = useState("")
     const [quartierFilter, setQuartierFilter] = useState("")
     const [statutFilter, setStatutFilter] = useState("")
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
 
+    // sorting 
+    type SortKey =
+        | "id"
+        | "client"
+        | "utilisateur"
+        | "planifiee"
+        | "type"
+        | "categorie"
+        | "zone"
+        | "quartier"
+        | "date"
+        | "statut";
+
+    const [sortConfig, setSortConfig] = useState<{
+        key: SortKey;
+        order: "asc" | "desc";
+    }>({
+        key: "id",
+        order: "desc",
+    });
+    const handleSort = (key: SortKey) => {
+        setSortConfig(prev =>
+            prev.key === key
+                ? {
+                    key,
+                    order: prev.order === "asc" ? "desc" : "asc",
+                }
+                : {
+                    key,
+                    order: "asc",
+                }
+        );
+    };
+
+    const SortableHeader = ({
+        label,
+        sortKey,
+    }: {
+        label: string;
+        sortKey: SortKey;
+    }) => (
+        <button
+            onClick={() => handleSort(sortKey)}
+            className="flex items-center gap-1 hover:text-gray-900"
+        >
+            {label}
+            <span className="text-[10px]">
+                {sortConfig.key === sortKey
+                    ? sortConfig.order === "asc"
+                        ? "▲"
+                        : "▼"
+                    : ""}
+            </span>
+        </button>
+    );
     // visite filter handling 
     const filteredVisites = useMemo(() => {
         const filtered = getFilteredVisites(visites, {
@@ -100,9 +157,113 @@ function ListeVisite() {
         });
 
         return filtered.sort((a, b) => {
-            return sortOrder === "asc" ? a.id - b.id : b.id - a.id;
+            switch (sortConfig.key) {
+                case "id":
+                    return sortConfig.order === "asc"
+                        ? a.id - b.id
+                        : b.id - a.id;
+
+                case "client": {
+                    const valueA = a.client?.nom ?? "";
+                    const valueB = b.client?.nom ?? "";
+
+                    return sortConfig.order === "asc"
+                        ? valueA.localeCompare(valueB)
+                        : valueB.localeCompare(valueA);
+                }
+
+                case "utilisateur": {
+                    const valueA =
+                        `${a.utilisateur?.firstname ?? ""} ${a.utilisateur?.name ?? ""}`.trim();
+
+                    const valueB =
+                        `${b.utilisateur?.firstname ?? ""} ${b.utilisateur?.name ?? ""}`.trim();
+
+                    return sortConfig.order === "asc"
+                        ? valueA.localeCompare(valueB)
+                        : valueB.localeCompare(valueA);
+                }
+
+                case "planifiee":
+                    return sortConfig.order === "asc"
+                        ? a.type - b.type
+                        : b.type - a.type;
+
+                case "type": {
+                    const valueA = a.type_visite?.nom ?? "";
+                    const valueB = b.type_visite?.nom ?? "";
+
+                    return sortConfig.order === "asc"
+                        ? valueA.localeCompare(valueB)
+                        : valueB.localeCompare(valueA);
+                }
+
+                case "categorie": {
+                    const valueA = a.categorie_visite?.intitule ?? "";
+                    const valueB = b.categorie_visite?.intitule ?? "";
+
+                    return sortConfig.order === "asc"
+                        ? valueA.localeCompare(valueB)
+                        : valueB.localeCompare(valueA);
+                }
+
+                case "zone": {
+                    const valueA = a.client?.zone ?? "";
+                    const valueB = b.client?.zone ?? "";
+
+                    return sortConfig.order === "asc"
+                        ? valueA.localeCompare(valueB)
+                        : valueB.localeCompare(valueA);
+                }
+
+                case "quartier": {
+                    const valueA = a.client?.quartier ?? "";
+                    const valueB = b.client?.quartier ?? "";
+
+                    return sortConfig.order === "asc"
+                        ? valueA.localeCompare(valueB)
+                        : valueB.localeCompare(valueA);
+                }
+
+                case "date": {
+                    const dateA = a.date
+                        ? new Date(a.date).getTime()
+                        : 0;
+
+                    const dateB = b.date
+                        ? new Date(b.date).getTime()
+                        : 0;
+
+                    return sortConfig.order === "asc"
+                        ? dateA - dateB
+                        : dateB - dateA;
+                }
+
+                case "statut": {
+                    const getStatusOrder = (visite: typeof a) => {
+                        const isPast =
+                            visite.date &&
+                            new Date(visite.date) < new Date();
+
+                        if (visite.statut === 1) return 2; // Terminée
+                        if (visite.statut === 0 && isPast) return 0; // En retard
+
+                        return 1; // A venir
+                    };
+
+                    const valueA = getStatusOrder(a);
+                    const valueB = getStatusOrder(b);
+
+                    return sortConfig.order === "asc"
+                        ? valueA - valueB
+                        : valueB - valueA;
+                }
+
+                default:
+                    return 0;
+            }
         });
-    }, [visites, clientsFilter, usersFilter, planifiedFilter, typeVisiteFilter, categorieVisiteFilter, zoneFilter, quartierFilter, statutFilter, sortOrder])
+    }, [visites, clientsFilter, usersFilter, planifiedFilter, typeVisiteFilter, categorieVisiteFilter, zoneFilter, quartierFilter, statutFilter, sortConfig])
 
 
     // handling modal 
@@ -145,6 +306,7 @@ function ListeVisite() {
             year: "numeric",
         });
 
+
     return (
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="border-b border-gray-200 p-5">
@@ -183,30 +345,20 @@ function ListeVisite() {
 
             {/* ── Desktop table ── */}
             <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-sm ml-2">
-                    <thead>
-                        <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500">
-                            <th className="px-1 py-3">
-                                <button
-                                    onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}
-                                    className="flex items-center gap-1 hover:text-gray-900 transition-colors"
-                                >
-                                    Id
-                                    <span className="text-[10px]">
-                                        {sortOrder === "asc" ? "▲" : "▼"}
-                                    </span>
-                                </button>
-                            </th>
-                            <th className="px-1 py-3">Client</th>
-                            <th className="px-1 py-3">Utilisateur</th>
-                            <th className="px-1 py-3">Planifiée</th>
-                            <th className="px-1 py-3">Type</th>
-                            <th className="px-1 py-3">Catégorie</th>
-                            <th className="px-1 py-3">Zone</th>
-                            <th className="px-1 py-3">Quartier</th>
-                            <th className="px-1 py-3">Date</th>
-                            {/* <th className="px-1 py-3">Objet</th> */}
-                            <th className="px-1 py-3">Statut</th>
+                <table className="w-full text-sm ml-4 mt-2">
+                    <thead className="py-4">
+                        <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500 ">
+                            
+                            <th><SortableHeader label="Id" sortKey="id" /></th>
+                            <th><SortableHeader label="Client" sortKey="client" /></th>
+                            <th><SortableHeader label="Utilisateur" sortKey="utilisateur" /></th>
+                            <th><SortableHeader label="Planifiée" sortKey="planifiee" /></th>
+                            <th><SortableHeader label="Type" sortKey="type" /></th>
+                            <th><SortableHeader label="Catégorie" sortKey="categorie" /></th>
+                            <th><SortableHeader label="Zone" sortKey="zone" /></th>
+                            <th><SortableHeader label="Quartier" sortKey="quartier" /></th>
+                            <th><SortableHeader label="Date" sortKey="date" /></th>
+                            <th><SortableHeader label="Statut" sortKey="statut" /></th>
                             <th className="px-1 py-3"></th>
                         </tr>
                     </thead>
