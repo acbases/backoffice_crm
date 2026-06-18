@@ -67,7 +67,7 @@ function VisiteInfo({ visite }: VisiteInfoProps) {
                             const isOverdue = visite.statut === 0 && isPast;
 
                             // 2. Assign classes based on status
-                            let badgeClass = "bg-yellow-100 text-yellow-700"; // Default: A venir
+                            let badgeClass = "bg-blue-100 text-blue-700"; // Default: A venir
                             let statusText = "A venir";
 
                             if (visite.statut === 1) {

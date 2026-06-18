@@ -133,7 +133,7 @@ export default function Layout() {
           <footer className="flex justify-center w-full">
             <a
               href="https://allpro.alphaciment.com/allpro/home.php"
-              className="m-2 mb-4 inline-flex justify-center items-center text-center px-6 py-3 bg-yellow-200 hover:bg-yellow-300 font-semibold rounded-lg shadow-md transition duration-200"
+              className="m-2 mb-4 inline-flex justify-center items-center text-center px-6 py-3 bg-blue-200 hover:bg-blue-300 font-semibold rounded-lg shadow-md transition duration-200"
             >
               Retour vers Allpro
             </a>
@@ -142,7 +142,7 @@ export default function Layout() {
           <footer className="flex justify-center w-full">
             <a
               href="https://allpro.alphaciment.com/allpro/home.php"
-              className="m-2 mb-4 inline-flex justify-center items-center text-center px-2 py-1 bg-yellow-200 hover:bg-yellow-300 font-semibold rounded-lg shadow-md transition duration-200"
+              className="m-2 mb-4 inline-flex justify-center items-center text-center px-2 py-1 bg-blue-200 hover:bg-blue-300 font-semibold rounded-lg shadow-md transition duration-200"
             >
               Allpro
             </a>
@@ -194,7 +194,7 @@ export default function Layout() {
               <footer className="flex justify-center w-full">
                 <a
                   href="https://allpro.alphaciment.com/allpro/home.php"
-                  className="m-2 mb-4 inline-flex justify-center items-center text-center px-6 py-3 bg-yellow-200 hover:bg-yellow-300 font-semibold rounded-lg shadow-md transition duration-200"
+                  className="m-2 mb-4 inline-flex justify-center items-center text-center px-6 py-3 bg-blue-200 hover:bg-blue-300 font-semibold rounded-lg shadow-md transition duration-200"
                 >
                   Retour vers Allpro
                 </a>

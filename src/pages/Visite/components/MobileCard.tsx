@@ -23,7 +23,7 @@ const MobileCard = ({ visite, onOpen, formatDate }: MobileCardProps) => {
 
                         if (visite.statut === 1) return "bg-green-100 text-green-700";
                         if (isOverdue) return "bg-red-100 text-red-700";
-                        return "bg-yellow-100 text-yellow-700";
+                        return "bg-blue-100 text-blue-700";
                     })()}`}
                 >
                     {(() => {
@@ -73,7 +73,7 @@ const MobileCard = ({ visite, onOpen, formatDate }: MobileCardProps) => {
                 <button
                     type="button"
                     onClick={() => onOpen(visite.id)}
-                    className="rounded-lg bg-yellow-200 px-4 py-2 text-sm font-medium hover:bg-yellow-300 transition-colors"
+                    className="rounded-lg bg-blue-200 px-4 py-2 text-sm font-medium hover:bg-blue-300 transition-colors"
                 >
                     Voir détails
                 </button>

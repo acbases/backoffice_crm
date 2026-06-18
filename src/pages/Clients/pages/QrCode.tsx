@@ -83,16 +83,88 @@ export default function ClientQrCode() {
     };
   }, [selectedClient]);
 
-  const handleDownload = () => {
-    if (!qrBlob || !selectedClient) return;
-    const url = URL.createObjectURL(qrBlob);
+  const generateA4QrImage = async () => {
+    if (!qrUrl || !selectedClient) return;
+
+    const canvas = document.createElement("canvas");
+
+    const A4_WIDTH = 2480;
+    const A4_HEIGHT = 3508;
+
+    canvas.width = A4_WIDTH;
+    canvas.height = A4_HEIGHT;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // White background
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+
+    // Load QR image
+    const qrImg = new Image();
+    qrImg.src = qrUrl;
+
+    // Load logo
+    const logoImg = new Image();
+    logoImg.src = "/crm_admin/logo-ac.png";
+
+    await Promise.all([
+      new Promise((resolve) => {
+        qrImg.onload = resolve;
+      }),
+      new Promise((resolve) => {
+        logoImg.onload = resolve;
+      }),
+    ]);
+
+    // =====================
+    // TOP SECTION : QR CODE
+    // =====================
+
+    const qrSize = 1800;
+
+    ctx.drawImage(
+      qrImg,
+      (A4_WIDTH - qrSize) / 2,
+      150,
+      qrSize,
+      qrSize
+    );
+
+    // =====================
+    // BOTTOM SECTION : LOGO
+    // =====================
+
+    const logoWidth = 1300;
+    const logoHeight = 900;
+
+    ctx.drawImage(
+      logoImg,
+      (A4_WIDTH - logoWidth) / 2,
+      2200,
+      logoWidth,
+      logoHeight
+    );
+
+    // Optional client name
+    ctx.fillStyle = "#000";
+    ctx.font = "bold 80px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText(
+      selectedClient.nom,
+      A4_WIDTH / 2,
+      2100
+    );
+
+    // Download
+    const output = canvas.toDataURL("image/png");
+
     const link = document.createElement("a");
-    link.href = url;
-    link.download = `${selectedClient.nom}-qr-code.png`;
-    document.body.appendChild(link);
+    link.href = output;
+    link.download = `${selectedClient.nom}-A4-QR.png`;
     link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
   const [activating, setActivating] = useState(false);
@@ -164,11 +236,10 @@ export default function ClientQrCode() {
             <div className="w-full flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700">QR Code Status:</span>
               <span
-                className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  selectedClient.status_qrcode
+                className={`px-3 py-1 rounded-full text-xs font-medium ${selectedClient.status_qrcode
                     ? "bg-green-100 text-green-800"
                     : "bg-red-100 text-red-800"
-                }`}
+                  }`}
               >
                 {selectedClient.status_qrcode ? "Active" : "Inactive"}
               </span>
@@ -180,9 +251,9 @@ export default function ClientQrCode() {
             />
             <div className="w-full flex items-center justify-between space-x-2">
               <button
-                onClick={handleDownload}
+                onClick={generateA4QrImage}
                 disabled={!qrBlob}
-                className="flex-1 px-4 py-2 rounded-lg bg-yellow-200 text-sm font-medium hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 rounded-lg bg-blue-200 text-sm font-medium hover:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Télécharger QR Code
               </button>

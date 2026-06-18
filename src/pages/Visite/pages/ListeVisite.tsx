@@ -412,7 +412,7 @@ function ListeVisite() {
                                         const isOverdue = visite.statut === 0 && isPast;
 
                                         // 2. Assign classes based on status
-                                        let badgeClass = "bg-yellow-100 text-yellow-700"; // Default: A venir
+                                        let badgeClass = "bg-blue-100 text-blue-700"; // Default: A venir
                                         let statusText = "A venir";
 
                                         if (visite.statut === 1) {
@@ -436,7 +436,7 @@ function ListeVisite() {
                                     <button
                                         type="button"
                                         onClick={() => openVisite(visite.id)}
-                                        className="rounded-lg bg-yellow-200 px-4 py-1.5 text-xs font-medium hover:bg-yellow-300 whitespace-nowrap"
+                                        className="rounded-lg bg-blue-200 px-4 py-1.5 text-xs font-medium hover:bg-blue-300 whitespace-nowrap"
                                     >
                                         Voir
                                     </button>
