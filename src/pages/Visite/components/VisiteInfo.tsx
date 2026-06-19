@@ -72,7 +72,7 @@ function VisiteInfo({ visite }: VisiteInfoProps) {
 
                             if (visite.statut === 1) {
                                 badgeClass = "bg-green-100 text-green-700";
-                                statusText = "Terminée";
+                                statusText = "Effectuée";
                             } else if (isOverdue) {
                                 badgeClass = "bg-red-100 text-red-700";
                                 statusText = "En retard";

@@ -271,6 +271,7 @@ function ListeVisite() {
         setSelectedId(String(id));
         setIsModalOpen(true);
     };
+
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedId(null);
@@ -347,8 +348,7 @@ function ListeVisite() {
             <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-sm ml-4 mt-2">
                     <thead className="py-4">
-                        <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500 ">
-                            
+                        <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500 ">  
                             <th><SortableHeader label="Id" sortKey="id" /></th>
                             <th><SortableHeader label="Client" sortKey="client" /></th>
                             <th><SortableHeader label="Utilisateur" sortKey="utilisateur" /></th>
@@ -417,7 +417,7 @@ function ListeVisite() {
 
                                         if (visite.statut === 1) {
                                             badgeClass = "bg-green-100 text-green-700";
-                                            statusText = "Terminée";
+                                            statusText = "Effectuée";
                                         } else if (isOverdue) {
                                             badgeClass = "bg-red-100 text-red-700";
                                             statusText = "En retard";
