@@ -209,7 +209,7 @@ export default function Layout() {
         className="flex-1 flex flex-col min-w-0 overflow-y-auto"
         id="main-content"
       >
-        <div className="p-6 w-full mx-auto">
+        <div className="px-6 w-full mx-auto">
           <Outlet />
         </div>
       </main>

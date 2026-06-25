@@ -15,9 +15,9 @@ import { getTypeVisites, type TypeVisiteItem } from "../api/typeVisiteApi";
 import { getCategorieVisites, type CategorieVisiteItem } from "../api/categorieVisiteApi";
 import { getZones } from "@/pages/Clients/api/zoneApi";
 import { getQuartiers } from "@/pages/Clients/api/quartierApi";
+import { File, SquareArrowOutUpRight } from "lucide-react";
 
-
-
+import { exportVisitesToExcel } from "../utils/ExportVisitesToExcel";
 
 function ListeVisite() {
     // visites states
@@ -143,6 +143,7 @@ function ListeVisite() {
             </span>
         </button>
     );
+
     // visite filter handling 
     const filteredVisites = useMemo(() => {
         const filtered = getFilteredVisites(visites, {
@@ -309,11 +310,20 @@ function ListeVisite() {
 
 
     return (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-            <div className="border-b border-gray-200 p-5">
+        <div className="flex flex-col h-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="flex gap-6 border-b border-gray-200 p-5">
                 <h2 className="text-lg font-semibold text-gray-900">
                     Liste de tous les visites
                 </h2>
+                <button
+                    onClick={() => exportVisitesToExcel(visites)}
+                    className="flex gap-1 items-center justify-center text-sm px-2 transition-colors duration-100 bg-blue-200 rounded-lg hover:bg-blue-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer"
+                >
+                    <File
+                        className="w-[15px] h-[15px] text-gray-500 "
+                    />
+                    Extraction
+                </button>
             </div>
 
             <div className="mt-4 ml-2">
@@ -345,10 +355,11 @@ function ListeVisite() {
             </div>
 
             {/* ── Desktop table ── */}
-            <div className="hidden md:block overflow-x-auto">
+            <div className="hidden md:flex-1 md:block md:min-h-0 md:overflow-y-auto">
                 <table className="w-full text-sm ml-4 mt-2">
                     <thead className="py-4">
-                        <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500 ">  
+                        <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500 ">
+                            <th className="px-1 py-3"></th>
                             <th><SortableHeader label="Id" sortKey="id" /></th>
                             <th><SortableHeader label="Client" sortKey="client" /></th>
                             <th><SortableHeader label="Utilisateur" sortKey="utilisateur" /></th>
@@ -359,7 +370,6 @@ function ListeVisite() {
                             <th><SortableHeader label="Quartier" sortKey="quartier" /></th>
                             <th><SortableHeader label="Date" sortKey="date" /></th>
                             <th><SortableHeader label="Statut" sortKey="statut" /></th>
-                            <th className="px-1 py-3"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -368,6 +378,13 @@ function ListeVisite() {
                                 key={visite.id}
                                 className="border-b border-gray-100 last:border-0"
                             >
+                                <td className="px-1 py-3">
+
+                                    <SquareArrowOutUpRight
+                                        onClick={() => openVisite(visite.id)}
+                                        className="w-[15px] h-[15px] text-gray-500 transition-all duration-200 ease-in-out hover:text-blue-600 hover:scale-110 cursor-pointer"
+                                    />
+                                </td>
                                 <td className="px-1 py-3 font-medium text-gray-900">
                                     {visite.id ?? "-"}
                                 </td>
@@ -381,7 +398,7 @@ function ListeVisite() {
                                 </td>
 
                                 <td className="px-1 py-3 text-center">
-                                    <span className={`px-2.5 py-1 rounded text-sm font-medium ${visite.type === 0 ? 'bg-blue-200' : 'bg-green-200'}`}>
+                                    <span className={`px-2.5 py-1 rounded text-sm font-medium ${visite.type === 0 ? 'bg-green-200' : 'bg-red-200'}`}>
                                         {visite.type === 0 ? "oui" : "non"}
                                     </span>
                                 </td>
@@ -412,7 +429,7 @@ function ListeVisite() {
                                         const isOverdue = visite.statut === 0 && isPast;
 
                                         // 2. Assign classes based on status
-                                        let badgeClass = "bg-blue-100 text-blue-700"; // Default: A venir
+                                        let badgeClass = "bg-purple-100 text-purple-700"; // Default: A venir
                                         let statusText = "A venir";
 
                                         if (visite.statut === 1) {
@@ -432,15 +449,7 @@ function ListeVisite() {
                                     })()}
                                 </td>
 
-                                <td className="px-1 py-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => openVisite(visite.id)}
-                                        className="rounded-lg bg-blue-200 px-4 py-1.5 text-xs font-medium hover:bg-blue-300 whitespace-nowrap"
-                                    >
-                                        Voir
-                                    </button>
-                                </td>
+
                             </tr>
                         ))}
                     </tbody>
@@ -478,8 +487,16 @@ function ListeVisite() {
                     </>
                 )}
             </AnimatePresence>
+
+            <div className="shrink-0 flex items-center justify-between border-t border-gray-200 bg-white px-5 py-3 text-sm text-gray-500">
+                <span>{filteredVisites.length} résultats</span>
+                <div className="flex items-center gap-1">
+                    <button className="rounded px-2 py-1 hover:bg-gray-100 disabled:opacity-40">‹</button>
+                    <span className="px-2">Page 1</span>
+                    <button className="rounded px-2 py-1 hover:bg-gray-100">›</button>
+                </div>
+            </div>
         </div>
     );
 }
-
 export default ListeVisite;
