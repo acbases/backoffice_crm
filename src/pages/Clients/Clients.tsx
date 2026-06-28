@@ -72,6 +72,17 @@ export default function Clients() {
         >
           QR Code
         </NavLink>
+        <NavLink
+          to="maps"
+          className={({ isActive }) =>
+            `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
+              ? "bg-red-100 text-red-600"
+              : "bg-white text-gray-600 hover:bg-gray-100"
+            }`
+          }
+        >
+          Maps
+        </NavLink>
       </div>
       <div className="flex-1 min-h-0 overflow-hidden">
         <Outlet

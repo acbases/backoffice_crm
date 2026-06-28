@@ -20,14 +20,8 @@ const getQuartierLabel = (quartier: ClientItem["quartier"]) =>
 export default function ListeClient() {
   // client states
   const navigate = useNavigate();
-  const { clients, setSelectedClientId, loading, loadClients } =
-    useOutletContext<ClientsContext>();
+  const { clients, setSelectedClientId, loading, loadClients } = useOutletContext<ClientsContext>();
   const [error, setError] = useState("");
-
-  // Re-fetch if needed (e.g. if we want to ensure fresh data on mount)
-  // useEffect(() => {
-  //   loadClients();
-  // }, [loadClients]);
 
 
   // filters data state
@@ -124,16 +118,18 @@ export default function ListeClient() {
     navigate(`../${id}/qr-code`);
   };
 
+  const handleOpenMap = () => {
+    const params = new URLSearchParams();
 
-  // use to display name on the mobile 
-  const getInitials = (nom: string) =>
-    nom
-      .split(" ")
-      .map((w) => w[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
+    if (agenceFilter) params.set("agence", agenceFilter);
+    if (zoneFilter) params.set("zone", zoneFilter);
+    if (quartierFilter) params.set("quartier", quartierFilter);
+    if (categorieFilter) params.set("categorie", categorieFilter);
+    if (nomFilter) params.set("nom", nomFilter);
+    if (qrCodeFilter !== "all") params.set("qrcode", qrCodeFilter);
 
+    navigate(`../maps?${params.toString()}`);
+  };
 
   // display handling with error
   if (loading)
@@ -163,6 +159,13 @@ export default function ListeClient() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Liste des clients</h2>
         </div>
+        {/* navigation to maps page */}
+        <button
+          onClick={handleOpenMap}
+          className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-blue-200 px-3 py-1.5 text-xs font-medium hover:bg-blue-300"
+        >
+          Voir sur la carte
+        </button>
 
       </div>
       {/* filters ui component */}

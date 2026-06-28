@@ -4,6 +4,7 @@ import Visite from "./pages/Visite/Visite";
 import Clients from "./pages/Clients/Clients";
 import AjoutClient from "./pages/Clients/pages/AjoutClient";
 import ListeClient from "./pages/Clients/pages/ListeClient";
+import MapsClient from "./pages/Clients/pages/MapsClient";
 import AjoutVisite from "./pages/Visite/pages/AjoutVisite";
 import ListeVisite from "./pages/Visite/pages/ListeVisite";
 import ClientQrCode from "./pages/Clients/pages/QrCode";
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="ajout" element={<AjoutClient />} />
             <Route path="liste" element={<ListeClient />} />
             <Route path="qr-code" element={<ClientQrCode />} />
+            <Route path="maps" element={<MapsClient />} />
             <Route path=":idclient/qr-code" element={<ClientQrCode />} />
           </Route>
           <Route path="visite" element={<Visite />} >
