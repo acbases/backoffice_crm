@@ -16,12 +16,12 @@ export default function Visite() {
   return (
     <div id="Visites-page" className="flex flex-col h-screen overflow-hidden space-y-0">
       {/* page title */}
-      <div className="shrink-0 space-y-2">
-        <h1 className="text-2xl font-bold text-gray-900">Visites</h1>
-      </div>
 
       {/* tabs */}
-      <div className="shrink-0 flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+      <div className="shrink-0 flex flex-wrap gap-2 border-b border-gray-200 p-3">
+        <div className="shrink-0 space-y-2 pr-4">
+          <h1 className="text-2xl font-bold text-gray-900">Visites</h1>
+        </div>
         <NavLink
           to="ajout"
           className={({ isActive }) =>

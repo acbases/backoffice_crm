@@ -33,22 +33,18 @@ export default function Clients() {
   }, [loadClients]);
 
   return (
-    <div id="Clients-page" className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
-        <p className="text-sm text-gray-500">
-          Ajouter, naviguer et ouvrir pour chaque client.
-        </p>
-      </div>
+    <div id="Clients-page" className="flex flex-col h-screen overflow-hidden space-y-0">
 
-      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+      <div className="shrink-0 flex flex-wrap gap-2 border-b border-gray-200 p-3">
+        <div className="shrink-0 space-y-2 pr-4">
+          <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
+        </div>
         <NavLink
           to="ajout"
           className={({ isActive }) =>
-            `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              isActive
-                ? "bg-red-100 text-red-600"
-                : "bg-white text-gray-600 hover:bg-gray-100"
+            `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
+              ? "bg-red-100 text-red-600"
+              : "bg-white text-gray-600 hover:bg-gray-100"
             }`
           }
         >
@@ -57,10 +53,9 @@ export default function Clients() {
         <NavLink
           to="liste"
           className={({ isActive }) =>
-            `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              isActive
-                ? "bg-red-100 text-red-600"
-                : "bg-white text-gray-600 hover:bg-gray-100"
+            `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
+              ? "bg-red-100 text-red-600"
+              : "bg-white text-gray-600 hover:bg-gray-100"
             }`
           }
         >
@@ -69,27 +64,27 @@ export default function Clients() {
         <NavLink
           to={selectedClientId ? `${selectedClientId}/qr-code` : "qr-code"}
           className={({ isActive }) =>
-            `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              isActive
-                ? "bg-red-100 text-red-600"
-                : "bg-white text-gray-600 hover:bg-gray-100"
+            `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
+              ? "bg-red-100 text-red-600"
+              : "bg-white text-gray-600 hover:bg-gray-100"
             }`
           }
         >
           QR Code
         </NavLink>
       </div>
-
-      <Outlet
-        context={{
-          clients,
-          setClients,
-          selectedClientId,
-          setSelectedClientId,
-          loadClients,
-          loading,
-        }}
-      />
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <Outlet
+          context={{
+            clients,
+            setClients,
+            selectedClientId,
+            setSelectedClientId,
+            loadClients,
+            loading,
+          }}
+        />
+      </div>
     </div>
   );
 }

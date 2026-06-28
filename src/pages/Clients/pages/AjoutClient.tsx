@@ -88,7 +88,7 @@ export default function AjoutClient() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-xl space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+      className="m-4 max-w-xl space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
     >
       <div>
         <h2 className="text-lg font-semibold text-gray-900">Ajouter un client</h2>

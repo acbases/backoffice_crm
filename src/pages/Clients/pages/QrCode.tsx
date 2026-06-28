@@ -204,7 +204,7 @@ export default function ClientQrCode() {
   }
 
   return (
-    <div className="flex gap-6">
+    <div className="flex gap-6 m-4">
 
       <div className="max-w-2xl space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <div>

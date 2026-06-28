@@ -79,7 +79,7 @@ export default function ListeClient() {
         normalizeText(client.agence?.intitule) !== normalizeText(agenceFilter)
       ) {
         return false;
-      }       
+      }
 
       if (zoneFilter && normalizeText(client.zone) !== normalizeText(zoneFilter)) {
         return false;
@@ -158,41 +158,41 @@ export default function ListeClient() {
     );
 
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className="border-b border-gray-200 p-5">
+    <div className="m-4 flex flex-col h-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="flex gap-6 border-b border-gray-200 p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Liste des clients</h2>
         </div>
 
-        {/* filters ui component */}
-        <div className="mt-4">
-          <ClientFilters
-            qrCodeFilter={qrCodeFilter}
-            setQrCodeFilter={(value) => setQrCodeFilter(value as QrCodeFilter)}
-            agenceFilter={agenceFilter}
-            setAgenceFilter={setAgenceFilter}
-            zoneFilter={zoneFilter}
-            setZoneFilter={setZoneFilter}
-            quartierFilter={quartierFilter}
-            setQuartierFilter={setQuartierFilter}
-            categorieFilter={categorieFilter}
-            setCategorieFilter={setCategorieFilter}
-            nomFilter={nomFilter}
-            setNomFilter={setNomFilter}
-            agenceOptions={agenceOptions}
-            zoneOptions={zoneOptions}
-            quartierOptions={quartierOptions}
-            categorieOptions={categorieOptions}
-            totalCount={clients.length}
-            withQrCodeCount={withQrCodeCount}
-            withoutQrCodeCount={withoutQrCodeCount}
-          />
-        </div>
+      </div>
+      {/* filters ui component */}
+      <div className="mt-4 ml-2">
+        <ClientFilters
+          qrCodeFilter={qrCodeFilter}
+          setQrCodeFilter={(value) => setQrCodeFilter(value as QrCodeFilter)}
+          agenceFilter={agenceFilter}
+          setAgenceFilter={setAgenceFilter}
+          zoneFilter={zoneFilter}
+          setZoneFilter={setZoneFilter}
+          quartierFilter={quartierFilter}
+          setQuartierFilter={setQuartierFilter}
+          categorieFilter={categorieFilter}
+          setCategorieFilter={setCategorieFilter}
+          nomFilter={nomFilter}
+          setNomFilter={setNomFilter}
+          agenceOptions={agenceOptions}
+          zoneOptions={zoneOptions}
+          quartierOptions={quartierOptions}
+          categorieOptions={categorieOptions}
+          totalCount={clients.length}
+          withQrCodeCount={withQrCodeCount}
+          withoutQrCodeCount={withoutQrCodeCount}
+        />
       </div>
 
-      {/* desktop laptop view */}
-      <div className="hidden overflow-x-auto md:block">
-        <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
+      {/* desktop-laptop view */}
+      <div className="hidden md:flex-1 md:block md:min-h-0 md:overflow-y-auto">
+        <table className="w-full text-sm ml-4 mt-2" style={{ tableLayout: "fixed" }}>
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500">
               <th className="w-[20%] px-2 py-3">Nom</th>
@@ -229,9 +229,8 @@ export default function ListeClient() {
                   </td>
                   <td className="px-2 py-3">
                     <span
-                      className={`rounded px-2 py-1 text-sm font-medium ${
-                        client.status_qrcode ? "bg-green-200" : "bg-red-200"
-                      }`}
+                      className={`rounded px-2 py-1 text-sm font-medium ${client.status_qrcode ? "bg-green-200" : "bg-red-200"
+                        }`}
                     >
                       {client.status_qrcode ? "Oui" : "Non"}
                     </span>
@@ -266,7 +265,14 @@ export default function ListeClient() {
           </tbody>
         </table>
       </div>
-
+      <div className="shrink-0 flex items-center justify-between border-t border-gray-200 bg-white px-5 py-3 text-sm text-gray-500">
+        <span>{filteredClients.length} résultats</span>
+        <div className="flex items-center gap-1">
+          <button className="rounded px-2 py-1 hover:bg-gray-100 disabled:opacity-40">‹</button>
+          <span className="px-2">Page 1</span>
+          <button className="rounded px-2 py-1 hover:bg-gray-100">›</button>
+        </div>
+      </div>
     </div>
   );
 }

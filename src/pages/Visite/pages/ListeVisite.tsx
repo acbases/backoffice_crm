@@ -310,7 +310,7 @@ function ListeVisite() {
 
 
     return (
-        <div className="flex flex-col h-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="m-4 flex flex-col h-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="flex gap-6 border-b border-gray-200 p-5">
                 <h2 className="text-lg font-semibold text-gray-900">
                     Liste de tous les visites
@@ -356,7 +356,7 @@ function ListeVisite() {
 
             {/* ── Desktop table ── */}
             <div className="hidden md:flex-1 md:block md:min-h-0 md:overflow-y-auto">
-                <table className="w-full text-sm ml-4 mt-2">
+                <table className="w-full text-sm ml-4 mt-2" style={{ tableLayout: "fixed" }}>
                     <thead className="py-4">
                         <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500 ">
                             <th className="px-1 py-3"></th>
@@ -463,7 +463,7 @@ function ListeVisite() {
                 formatDate={formatDate}
             />
 
-            {/* Modal */}
+            {/* Modal detail visite*/}
             <AnimatePresence>
                 {isModalOpen && selectedId && (
                     <>
