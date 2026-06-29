@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { getClients, type ClientItem } from "./api/clientApi";
 
 export type ClientsContext = {
@@ -32,10 +32,11 @@ export default function Clients() {
     loadClients();
   }, [loadClients]);
 
+  const location = useLocation();
   return (
     <div id="Clients-page" className="flex flex-col h-screen overflow-hidden space-y-0">
 
-      <div className="shrink-0 flex flex-wrap gap-2 border-b border-gray-200 p-3">
+      <div className="shrink-0 flex flex-wrap gap-2 p-3">
         <div className="shrink-0 space-y-2 pr-4">
           <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
         </div>
@@ -51,7 +52,7 @@ export default function Clients() {
           Ajout
         </NavLink>
         <NavLink
-          to="liste"
+          to={`liste${location.search}`}
           className={({ isActive }) =>
             `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
               ? "bg-red-100 text-red-600"
@@ -73,7 +74,7 @@ export default function Clients() {
           QR Code
         </NavLink>
         <NavLink
-          to="maps"
+          to={`maps${location.search}`}
           className={({ isActive }) =>
             `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
               ? "bg-red-100 text-red-600"

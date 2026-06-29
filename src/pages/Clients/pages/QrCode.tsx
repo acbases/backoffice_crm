@@ -204,9 +204,12 @@ export default function ClientQrCode() {
   }
 
   return (
-    <div className="flex gap-6 m-4">
-
-      <div className="max-w-2xl space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="flex md:flex-row flex-col gap-6 m-4 h-full overflow-y-auto">
+      {/* left panel */}
+      <div
+        className="self-start max-w-2xl space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+        id="left-panel"
+      >
         <div>
           <h2 className="text-lg font-semibold text-gray-900">QR Code client</h2>
         </div>
@@ -226,6 +229,7 @@ export default function ClientQrCode() {
           </select>
         </label>
 
+        {/* qr code */}
         <div className="flex flex-col items-center justify-center rounded-xl bg-gray-50 p-6 space-y-4">
           {loading ? (
             <div className="text-sm text-gray-500">Loading QR code...</div>
@@ -244,11 +248,13 @@ export default function ClientQrCode() {
                   {selectedClient.status_qrcode ? "Active" : "Inactive"}
                 </span>
               </div>
+              {/* qr image render */}
               <img
                 src={qrUrl}
                 alt={`QR code for ${selectedClient.nom}`}
-                className="h-[400px] w-[400px] rounded-lg border border-gray-200 bg-white p-3"
+                className=" w-[400px] rounded-lg border border-gray-200 bg-white p-3"
               />
+              {/* bouton telecharger et activer */}
               <div className="w-full flex items-center justify-between space-x-2">
                 <button
                   onClick={() =>

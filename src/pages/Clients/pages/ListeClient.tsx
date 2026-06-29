@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
 import type { ClientsContext } from "../Clients";
 import ClientFilters from "../components/ClientFilters";
 import { getClients, type ClientItem } from "../api/clientApi";
@@ -48,16 +48,38 @@ export default function ListeClient() {
         // Keep the list usable even if filter metadata fails to load.
       }
     };
-
     loadFilters();
   }, []);
+
+
   // filter values states
-  const [qrCodeFilter, setQrCodeFilter] = useState<QrCodeFilter>("all");
-  const [agenceFilter, setAgenceFilter] = useState("");
-  const [zoneFilter, setZoneFilter] = useState("");
-  const [quartierFilter, setQuartierFilter] = useState("");
-  const [categorieFilter, setCategorieFilter] = useState("");
-  const [nomFilter, setNomFilter] = useState("");
+  // const [qrCodeFilter, setQrCodeFilter] = useState<QrCodeFilter>("all");
+  // const [agenceFilter, setAgenceFilter] = useState("");
+  // const [zoneFilter, setZoneFilter] = useState("");
+  // const [quartierFilter, setQuartierFilter] = useState("");
+  // const [categorieFilter, setCategorieFilter] = useState("");
+  // const [nomFilter, setNomFilter] = useState("");
+  // ------
+  const [searchParams, setSearchParams] = useSearchParams();
+  const qrCodeFilter =
+    (searchParams.get("qrcode") as QrCodeFilter) ?? "all";
+  const agenceFilter = searchParams.get("agence") ?? "";
+  const zoneFilter = searchParams.get("zone") ?? "";
+  const quartierFilter = searchParams.get("quartier") ?? "";
+  const categorieFilter = searchParams.get("categorie") ?? "";
+  const nomFilter = searchParams.get("nom") ?? "";
+  const updateFilter = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+
+    setSearchParams(params);
+  };
+
   // client filter handling
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
@@ -104,7 +126,6 @@ export default function ListeClient() {
     });
   }, [agenceFilter, categorieFilter, clients, qrCodeFilter, quartierFilter, zoneFilter, nomFilter]);
 
-
   // qr code counts and open qr code 
   const withQrCodeCount = useMemo(
     () => clients.filter((client) => client.status_qrcode).length,
@@ -119,16 +140,15 @@ export default function ListeClient() {
   };
 
   const handleOpenMap = () => {
-    const params = new URLSearchParams();
+    // const params = new URLSearchParams();
+    // if (agenceFilter) params.set("agence", agenceFilter);
+    // if (zoneFilter) params.set("zone", zoneFilter);
+    // if (quartierFilter) params.set("quartier", quartierFilter);
+    // if (categorieFilter) params.set("categorie", categorieFilter);
+    // if (nomFilter) params.set("nom", nomFilter);
+    // if (qrCodeFilter !== "all") params.set("qrcode", qrCodeFilter);
 
-    if (agenceFilter) params.set("agence", agenceFilter);
-    if (zoneFilter) params.set("zone", zoneFilter);
-    if (quartierFilter) params.set("quartier", quartierFilter);
-    if (categorieFilter) params.set("categorie", categorieFilter);
-    if (nomFilter) params.set("nom", nomFilter);
-    if (qrCodeFilter !== "all") params.set("qrcode", qrCodeFilter);
-
-    navigate(`../maps?${params.toString()}`);
+    navigate(`../maps?${searchParams.toString()}`);
   };
 
   // display handling with error
@@ -172,17 +192,36 @@ export default function ListeClient() {
       <div className="mt-4 ml-2">
         <ClientFilters
           qrCodeFilter={qrCodeFilter}
-          setQrCodeFilter={(value) => setQrCodeFilter(value as QrCodeFilter)}
+          // setQrCodeFilter={(value) => setQrCodeFilter(value as QrCodeFilter)}
+          setQrCodeFilter={(value) =>
+            updateFilter("qrcode", value)
+          }
           agenceFilter={agenceFilter}
-          setAgenceFilter={setAgenceFilter}
+          // setAgenceFilter={setAgenceFilter}
+          setAgenceFilter={(value) =>
+            updateFilter("agence", value)
+          }
           zoneFilter={zoneFilter}
-          setZoneFilter={setZoneFilter}
+          // setZoneFilter={setZoneFilter}
+          setZoneFilter={(value) =>
+            updateFilter("zone", value)
+          }
           quartierFilter={quartierFilter}
-          setQuartierFilter={setQuartierFilter}
+          // setQuartierFilter={setQuartierFilter}
+          setQuartierFilter={(value) =>
+            updateFilter("quartier", value)
+          }
           categorieFilter={categorieFilter}
-          setCategorieFilter={setCategorieFilter}
+          // setCategorieFilter={setCategorieFilter}
+          setCategorieFilter={(value) =>
+            updateFilter("categorie", value)
+          }
           nomFilter={nomFilter}
-          setNomFilter={setNomFilter}
+          // setNomFilter={setNomFilter}
+          setNomFilter={(value) =>
+            updateFilter("nom", value)
+          }
+
           agenceOptions={agenceOptions}
           zoneOptions={zoneOptions}
           quartierOptions={quartierOptions}
