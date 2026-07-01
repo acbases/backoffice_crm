@@ -100,4 +100,9 @@ export async function updateClient(
   return data;
 }
 
+export async function getClientById(id: number) {
+  const { data } = await api.get<ClientItem>(`/client/${id}`);
+  return data;
+}
+
 

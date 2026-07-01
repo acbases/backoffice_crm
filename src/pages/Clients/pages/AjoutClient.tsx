@@ -70,7 +70,7 @@ export default function AjoutClient() {
         latitude: Number(form.latitude),
         longitude: Number(form.longitude),
         zone: form.zone,
-        quartier: form.quartier,
+        quartier: form.quartier,     
         idagence: Number(form.idagence),
         idcategorie: Number(form.idcategorie),
       });

@@ -204,7 +204,7 @@ export default function ClientQrCode() {
   }
 
   return (
-    <div className="flex md:flex-row flex-col gap-6 m-4 h-full overflow-y-auto">
+    <div className="flex flex-col md:flex-row  gap-6 m-4 h-full overflow-y-auto">
       {/* left panel */}
       <div
         className="self-start max-w-2xl space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
@@ -296,6 +296,7 @@ export default function ClientQrCode() {
         </div>
 
       </div>
+      {/* maps frame */}
       <div>
         <iframe
           height="600"

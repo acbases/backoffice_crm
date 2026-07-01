@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useSearchParams, useParams } from "react-router-dom";
 import type { ClientsContext } from "../Clients";
 import ClientFilters from "../components/ClientFilters";
 import { getClients, type ClientItem } from "../api/clientApi";
@@ -8,6 +8,7 @@ import { getAgences, type agencetItem } from "../api/agenceApi";
 import { getCategorieClients, type categorieClientItem } from "../api/categorieClientApi";
 import { getQuartiers } from "../api/quartierApi";
 import { getZones } from "../api/zoneApi";
+import ClientInfoModal from "../components/ClientInfoModal";
 
 type QrCodeFilter = "all" | "with" | "without";
 
@@ -51,15 +52,6 @@ export default function ListeClient() {
     loadFilters();
   }, []);
 
-
-  // filter values states
-  // const [qrCodeFilter, setQrCodeFilter] = useState<QrCodeFilter>("all");
-  // const [agenceFilter, setAgenceFilter] = useState("");
-  // const [zoneFilter, setZoneFilter] = useState("");
-  // const [quartierFilter, setQuartierFilter] = useState("");
-  // const [categorieFilter, setCategorieFilter] = useState("");
-  // const [nomFilter, setNomFilter] = useState("");
-  // ------
   const [searchParams, setSearchParams] = useSearchParams();
   const qrCodeFilter =
     (searchParams.get("qrcode") as QrCodeFilter) ?? "all";
@@ -140,28 +132,20 @@ export default function ListeClient() {
   };
 
   const handleOpenMap = () => {
-    // const params = new URLSearchParams();
-    // if (agenceFilter) params.set("agence", agenceFilter);
-    // if (zoneFilter) params.set("zone", zoneFilter);
-    // if (quartierFilter) params.set("quartier", quartierFilter);
-    // if (categorieFilter) params.set("categorie", categorieFilter);
-    // if (nomFilter) params.set("nom", nomFilter);
-    // if (qrCodeFilter !== "all") params.set("qrcode", qrCodeFilter);
-
     navigate(`../maps?${searchParams.toString()}`);
   };
 
   // display handling with error
   if (loading)
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-500">
+      <div className="m-4 rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-500">
         Loading clients...
       </div>
     );
 
   if (error)
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-600">
+      <div className="m-4 rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-600">
         {error}
       </div>
     );
@@ -172,6 +156,18 @@ export default function ListeClient() {
         No clients found.
       </div>
     );
+
+  // handling the id in url 
+  const { id } = useParams();
+  const selectedClientId = id ? Number(id) : null;
+
+  // handle opening and closing the update modal
+  const openUpdateModal = (id: number) => {
+    navigate(`/client/liste/${id}${location.search}`);
+  };
+  const closeUpdateModal = () => {
+    navigate(`/client/liste${location.search}`);
+  };
 
   return (
     <div className="m-4 flex flex-col h-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -192,32 +188,26 @@ export default function ListeClient() {
       <div className="mt-4 ml-2">
         <ClientFilters
           qrCodeFilter={qrCodeFilter}
-          // setQrCodeFilter={(value) => setQrCodeFilter(value as QrCodeFilter)}
           setQrCodeFilter={(value) =>
             updateFilter("qrcode", value)
           }
           agenceFilter={agenceFilter}
-          // setAgenceFilter={setAgenceFilter}
           setAgenceFilter={(value) =>
             updateFilter("agence", value)
           }
           zoneFilter={zoneFilter}
-          // setZoneFilter={setZoneFilter}
           setZoneFilter={(value) =>
             updateFilter("zone", value)
           }
           quartierFilter={quartierFilter}
-          // setQuartierFilter={setQuartierFilter}
           setQuartierFilter={(value) =>
             updateFilter("quartier", value)
           }
           categorieFilter={categorieFilter}
-          // setCategorieFilter={setCategorieFilter}
           setCategorieFilter={(value) =>
             updateFilter("categorie", value)
           }
           nomFilter={nomFilter}
-          // setNomFilter={setNomFilter}
           setNomFilter={(value) =>
             updateFilter("nom", value)
           }
@@ -234,17 +224,16 @@ export default function ListeClient() {
 
       {/* desktop-laptop view */}
       <div className="hidden md:flex-1 md:block md:min-h-0 md:overflow-y-auto">
-        <table className="w-full text-sm ml-4 mt-2" style={{ tableLayout: "fixed" }}>
+        <table className=" text-sm ml-4 mt-2" style={{ tableLayout: "fixed" }}>
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500">
-              <th className="w-[20%] px-2 py-3">Nom</th>
-              <th className="w-[12%] px-2 py-3">Agence</th>
-              <th className="w-[12%] px-2 py-3">Zone</th>
-              <th className="w-[15%] px-2 py-3">Quartier</th>
-              <th className="w-[12%] px-2 py-3">Categorie</th>
-              <th className="w-[13%] px-2 py-3">Cree le</th>
-              <th className="w-[13%] px-2 py-3">Avec Qr code</th>
-              <th className="w-[8%] px-2 py-3"></th>
+              <th className=" px-2 py-3">Nom</th>
+              <th className=" px-2 py-3">Agence</th>
+              <th className=" px-2 py-3">Zone</th>
+              <th className=" px-2 py-3">Quartier</th>
+              <th className=" px-2 py-3">Categorie</th>
+              <th className=" px-2 py-3">Avec Qr code</th>
+              <th className=" px-2 py-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -266,9 +255,7 @@ export default function ListeClient() {
                   <td className="px-2 py-3 text-gray-500">
                     {client.categorie_client?.intitule ?? "—"}
                   </td>
-                  <td className="px-2 py-3 text-gray-500">
-                    {client.created_at ? new Date(client.created_at).toLocaleDateString("fr-FR") : "—"}
-                  </td>
+
                   <td className="px-2 py-3">
                     <span
                       className={`rounded px-2 py-1 text-sm font-medium ${client.status_qrcode ? "bg-green-200" : "bg-red-200"
@@ -277,7 +264,7 @@ export default function ListeClient() {
                       {client.status_qrcode ? "Oui" : "Non"}
                     </span>
                   </td>
-                  <td className="px-2 py-3">
+                  <td className="px-2 py-3 flex gap-2">
                     <button
                       type="button"
                       onClick={() => openQrCode(client.id)}
@@ -300,20 +287,42 @@ export default function ListeClient() {
                       </svg>
                       QR
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => openUpdateModal(client.id)}
+                      className="inline-flex items-center rounded-lg bg-yellow-200 px-3 py-1.5 text-xs hover:bg-yellow-300"
+                    >
+                      Modifier
+                    </button>
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
+        {selectedClientId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="relative h-[80vh] w-[70%] mx-32 overflow-y-auto rounded-xl bg-white shadow-xl">
+
+              <button
+                onClick={closeUpdateModal}
+                className="absolute right-4 top-2 text-xl cursor-pointer text-red-500 hover:bg-red-200 rounded-full p-1 w-10 h-10 flex items-center justify-center"
+              >
+                ✕
+              </button>
+
+              <ClientInfoModal id={selectedClientId} onSuccess={closeUpdateModal} />
+            </div>
+          </div>
+        )}
       </div>
       <div className="shrink-0 flex items-center justify-between border-t border-gray-200 bg-white px-5 py-3 text-sm text-gray-500">
         <span>{filteredClients.length} résultats</span>
-        <div className="flex items-center gap-1">
+        {/* <div className="flex items-center gap-1">
           <button className="rounded px-2 py-1 hover:bg-gray-100 disabled:opacity-40">‹</button>
           <span className="px-2">Page 1</span>
           <button className="rounded px-2 py-1 hover:bg-gray-100">›</button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -87,7 +87,7 @@ export default function ClientFilters({
   withoutQrCodeCount,
 }: ClientFiltersProps) {
   return (
-    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+    <div className="flex gap-2">
       
       <label className="flex flex-col gap-1.5 text-sm text-gray-600" htmlFor="nom-filter">
         <span className="font-medium text-gray-700">Nom</span>

@@ -36,7 +36,7 @@ export default function Clients() {
   return (
     <div id="Clients-page" className="flex flex-col h-screen overflow-hidden space-y-0">
 
-      <div className="shrink-0 flex flex-wrap gap-2 p-3">
+      <div className="shrink-0 flex flex-wrap gap-2 p-3 mt-1.5">
         <div className="shrink-0 space-y-2 pr-4">
           <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
         </div>
