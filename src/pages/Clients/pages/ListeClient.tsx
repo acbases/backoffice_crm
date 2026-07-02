@@ -9,6 +9,7 @@ import { getCategorieClients, type categorieClientItem } from "../api/categorieC
 import { getQuartiers } from "../api/quartierApi";
 import { getZones } from "../api/zoneApi";
 import ClientInfoModal from "../components/ClientInfoModal";
+import { SquareArrowOutUpRight } from "lucide-react";
 
 type QrCodeFilter = "all" | "with" | "without";
 
@@ -20,7 +21,7 @@ const getQuartierLabel = (quartier: ClientItem["quartier"]) =>
 
 export default function ListeClient() {
   // client states
-  const navigate = useNavigate();
+  
   const { clients, setSelectedClientId, loading, loadClients } = useOutletContext<ClientsContext>();
   const [error, setError] = useState("");
 
@@ -62,13 +63,11 @@ export default function ListeClient() {
   const nomFilter = searchParams.get("nom") ?? "";
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
-
     if (value) {
       params.set(key, value);
     } else {
       params.delete(key);
     }
-
     setSearchParams(params);
   };
 
@@ -127,10 +126,11 @@ export default function ListeClient() {
     () => clients.filter((client) => !client.status_qrcode).length,
     [clients]
   );
+
+  const navigate = useNavigate();
   const openQrCode = (id: number) => {
     navigate(`../${id}/qr-code`);
   };
-
   const handleOpenMap = () => {
     navigate(`../maps?${searchParams.toString()}`);
   };
@@ -227,13 +227,13 @@ export default function ListeClient() {
         <table className=" text-sm ml-4 mt-2" style={{ tableLayout: "fixed" }}>
           <thead>
             <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500">
+              <th className=" px-2 py-3"></th>
               <th className=" px-2 py-3">Nom</th>
               <th className=" px-2 py-3">Agence</th>
               <th className=" px-2 py-3">Zone</th>
               <th className=" px-2 py-3">Quartier</th>
               <th className=" px-2 py-3">Categorie</th>
               <th className=" px-2 py-3">Avec Qr code</th>
-              <th className=" px-2 py-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -248,23 +248,11 @@ export default function ListeClient() {
               const quartierIntitule = getQuartierLabel(client.quartier);
               return (
                 <tr key={client.id} className="border-b border-gray-100 last:border-0">
-                  <td className="px-2 py-3 font-medium text-gray-900">{client.nom}</td>
-                  <td className="px-2 py-3 text-gray-500">{client.agence?.intitule ?? "—"}</td>
-                  <td className="px-2 py-3 text-gray-500">{client.zone ?? "—"}</td>
-                  <td className="px-2 py-3 text-gray-500">{quartierIntitule ?? "—"}</td>
-                  <td className="px-2 py-3 text-gray-500">
-                    {client.categorie_client?.intitule ?? "—"}
-                  </td>
-
-                  <td className="px-2 py-3">
-                    <span
-                      className={`rounded px-2 py-1 text-sm font-medium ${client.status_qrcode ? "bg-green-200" : "bg-red-200"
-                        }`}
-                    >
-                      {client.status_qrcode ? "Oui" : "Non"}
-                    </span>
-                  </td>
-                  <td className="px-2 py-3 flex gap-2">
+                  <td className="px-2 py-3 flex gap-2 justify-center items-center">
+                    <SquareArrowOutUpRight
+                      onClick={() => openUpdateModal(client.id)}
+                      className="w-[15px] h-[15px] text-gray-500 transition-all duration-200 ease-in-out hover:text-blue-600 hover:scale-110 cursor-pointer"
+                    />
                     <button
                       type="button"
                       onClick={() => openQrCode(client.id)}
@@ -287,13 +275,23 @@ export default function ListeClient() {
                       </svg>
                       QR
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => openUpdateModal(client.id)}
-                      className="inline-flex items-center rounded-lg bg-yellow-200 px-3 py-1.5 text-xs hover:bg-yellow-300"
+
+                  </td>
+                  <td className="px-2 py-3 font-medium text-gray-900">{client.nom}</td>
+                  <td className="px-2 py-3 text-gray-500">{client.agence?.intitule ?? "—"}</td>
+                  <td className="px-2 py-3 text-gray-500">{client.zone ?? "—"}</td>
+                  <td className="px-2 py-3 text-gray-500">{quartierIntitule ?? "—"}</td>
+                  <td className="px-2 py-3 text-gray-500">
+                    {client.categorie_client?.intitule ?? "—"}
+                  </td>
+
+                  <td className="px-2 py-3">
+                    <span
+                      className={`rounded px-2 py-1 text-sm font-medium ${client.status_qrcode ? "bg-green-200" : "bg-red-200"
+                        }`}
                     >
-                      Modifier
-                    </button>
+                      {client.status_qrcode ? "Oui" : "Non"}
+                    </span>
                   </td>
                 </tr>
               );

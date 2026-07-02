@@ -19,8 +19,9 @@ import {
     getRapportRetailByIdVisite
 } from "../api/rapportVisiteApi";
 import RapportViewAndRetailInfo from "./RapportViewAndRetailInfo";
+
 interface DetailVisiteProps {
-    id: string;
+    id: number;
     onClose: () => void;
 }
 

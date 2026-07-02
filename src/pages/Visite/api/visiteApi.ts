@@ -69,7 +69,7 @@ export type VisiteItem = {
     role_crm: string;
   }
 };
-export async function getVisiteById(id: string | number) {
+export async function getVisiteById(id: number) {
   const { data } = await api.get<VisiteItem>(`/visite/${id}`);
   return data;
 }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { Navigate, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import type { VisitesContext } from "../Visite";
 import { getVisites } from "../api/visiteApi";
@@ -278,6 +278,25 @@ function ListeVisite() {
         setSelectedId(null);
     };
 
+    const formatDate = (date: string) =>
+        new Date(date).toLocaleDateString("fr-FR", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+        });
+
+    // handling the id in url 
+    const { id } = useParams();
+    const selectedVisiteId = id ? Number(id) : null;
+
+    // handle opening and closing the update modal
+    const navigate = useNavigate();
+    const openUpdateModal = (id: number) => {
+        navigate(`/visite/liste/${id}${location.search}`);
+    };
+    const closeUpdateModal = () => {
+        navigate(`/visite/liste${location.search}`);
+    };
 
     // display handling with error
     if (loading)
@@ -301,12 +320,6 @@ function ListeVisite() {
             </div>
         );
 
-    const formatDate = (date: string) =>
-        new Date(date).toLocaleDateString("fr-FR", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-        });
 
 
     return (
@@ -381,7 +394,7 @@ function ListeVisite() {
                                 <td className="px-1 py-3">
 
                                     <SquareArrowOutUpRight
-                                        onClick={() => openVisite(visite.id)}
+                                        onClick={() => openUpdateModal(visite.id)}
                                         className="w-[15px] h-[15px] text-gray-500 transition-all duration-200 ease-in-out hover:text-blue-600 hover:scale-110 cursor-pointer"
                                     />
                                 </td>
@@ -465,7 +478,7 @@ function ListeVisite() {
 
             {/* Modal detail visite*/}
             <AnimatePresence>
-                {isModalOpen && selectedId && (
+                {selectedVisiteId && (
                     <>
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -481,7 +494,7 @@ function ListeVisite() {
                             className="fixed inset-0 z-[70] flex items-center justify-center p-4 pointer-events-none"
                         >
                             <div className="bg-white rounded-2xl shadow-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto">
-                                <DetailVisite id={selectedId} onClose={closeModal} />
+                                <DetailVisite id={selectedVisiteId} onClose={closeUpdateModal} />
                             </div>
                         </motion.div>
                     </>

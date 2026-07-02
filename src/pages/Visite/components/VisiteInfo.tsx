@@ -41,7 +41,7 @@ export default function VisiteInfo({
     const [categories, setCategories] = useState<CategorieVisiteItem[]>([]);
 
     const formatDateForInput = (date: string) => {
-        return new Date(date).toISOString().split("T")[0];
+        return date.split(" ")[0];
     };
     const [form, setForm] = useState({
         idclient: visite.client.id,
@@ -95,7 +95,7 @@ export default function VisiteInfo({
     visiteDate.setHours(0, 0, 0, 0);
     const diffInDays = (visiteDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
     const canEditDate = diffInDays > 3;
-    
+
     return (
         <div className="flex flex-col p-6 space-y-6 overflow-y-auto">
             <div className="flex items-center justify-between">

@@ -30,7 +30,10 @@ export default function App() {
           <Route path="visite" element={<Visite />} >
             <Route index element={<Navigate to="ajout" replace />} />
             <Route path="ajout" element={<AjoutVisite />} />
-            <Route path="liste" element={<ListeVisite />} />
+            <Route path="liste">
+              <Route index element={<ListeVisite />} />
+              <Route path=":id" element={<ListeVisite />} />
+            </Route>
           </Route>
           <Route path="dashboard" element={<Dashboard />} />
         </Route>
