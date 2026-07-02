@@ -78,3 +78,25 @@ export async function getVisites() {
   const { data } = await api.get<VisiteItem[]>("/visite");
   return data;
 }
+
+export type UpdateVisitePayload = Partial<{
+  idclient: number;
+  idutilisateur: number;
+  idcategorie: number;
+  date: string;
+  statut: number;
+  type: number;
+  idtype: number;
+  object: string;
+}>;
+
+export async function updateVisite(
+  id: number,
+  payload: UpdateVisitePayload
+) {
+  const { data } = await api.put<VisiteItem>(`/visite/${id}`, payload);
+  return data;
+}
+
+
+
