@@ -61,8 +61,8 @@ function FilterSelect({
                 className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
                 <option value="">{placeholder}</option>
-                {options.map((option) => (
-                    <option key={option.value} value={option.value}>
+                {options.map((option, index) => (
+                    <option key={index} value={option.value}>
                         {option.label}
                     </option>
                 ))}
