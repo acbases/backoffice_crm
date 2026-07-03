@@ -6,6 +6,7 @@ import { useSearchParams } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import { useMemo } from "react";
 import type { ClientsContext } from "../Clients";
+import { googleMapsConfig } from "@/utils/GoogleMaps";
 const containerStyle = {
     width: "100%",
     height: "100vh",
@@ -47,10 +48,7 @@ export default function MapsClient() {
         });
     }, [clients, agence, zone, quartier, categorie, nom, qrcode]);
 
-    const { isLoaded } = useJsApiLoader({
-        // id: "google-map-script",
-        googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    });
+    const { isLoaded } = useJsApiLoader(googleMapsConfig);
 
     const center = useMemo(() => {
         const first = filteredClients[0];

@@ -10,7 +10,9 @@ import ListeVisite from "./pages/Visite/pages/ListeVisite";
 import ClientQrCode from "./pages/Clients/pages/QrCode";
 import Dashboard from "./pages/Dashboard/Dashboard";
 
+
 export default function App() {
+  
   return (
     <Router basename="/crm_admin">
       <Routes>

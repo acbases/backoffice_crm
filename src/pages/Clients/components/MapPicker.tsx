@@ -1,3 +1,4 @@
+import { googleMapsConfig } from "@/utils/GoogleMaps";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 
 type MapPickerProps = {
@@ -16,9 +17,7 @@ export default function MapPicker({
     lng,
     onChange,
 }: MapPickerProps) {
-    const { isLoaded } = useJsApiLoader({
-        googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    });
+    const { isLoaded } = useJsApiLoader(googleMapsConfig);
     
     if (!isLoaded) return <p>Loading map...</p>;
 
