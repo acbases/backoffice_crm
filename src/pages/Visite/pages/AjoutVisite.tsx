@@ -6,6 +6,7 @@ import { getClients, type ClientItem } from '@/pages/Clients/api/clientApi';
 import { getUsers, type UserItem } from '@/pages/Utilisateurs/api/utilisateurApi';
 import { getTypeVisites, type TypeVisiteItem } from '../api/typeVisiteApi';
 import { getCategorieVisites, type CategorieVisiteItem } from '../api/categorieVisiteApi';
+import { getVisites, type VisitesItem } from "../api/visiteApi";
 const initialForm = {
     idclient: "",
     idutilisateur: "",
@@ -17,7 +18,11 @@ const initialForm = {
     object: "",
 };
 
-export default function AjoutVisite() {
+type AjoutVisiteProps = {
+    onCreated?: () => void;
+};
+
+export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
     const navigate = useNavigate();
     const [form, setForm] = useState(initialForm);
     const [loading, setLoading] = useState(false);
@@ -77,12 +82,19 @@ export default function AjoutVisite() {
             });
 
             setForm(initialForm);
-            // navigate("../liste");
-            window.location.href = "/crm_admin/visite/liste";
         } catch {
             setError("Unable to save the visite.");
-        } finally {
             setLoading(false);
+            return; // on sort avant d'appeler onCreated
+        }
+
+        setLoading(false);
+
+        // navigate("../liste");
+        if (onCreated) {
+            onCreated();
+        } else {
+            window.location.href = "/crm_admin/visite/liste";
         }
     };
     return (

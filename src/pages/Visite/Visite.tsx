@@ -14,7 +14,7 @@ export default function Visite() {
   const [visites, setVisites] = useState<VisiteItem[]>([]);
   const [selectedVisiteId, setSelectedVisiteId] = useState("");
   return (
-    <div id="Visites-page" className="flex flex-col h-screen overflow-hidden space-y-0">
+    <div id="Visites-page" className="flex flex-col min-h-screen space-y-0">
       {/* page title */}
 
       {/* tabs */}
@@ -45,7 +45,7 @@ export default function Visite() {
           Liste
         </NavLink>
       </div>
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0">
         <Outlet
           context={{
             visites,

@@ -7,6 +7,7 @@ import ListeClient from "./pages/Clients/pages/ListeClient";
 import MapsClient from "./pages/Clients/pages/MapsClient";
 import AjoutVisite from "./pages/Visite/pages/AjoutVisite";
 import ListeVisite from "./pages/Visite/pages/ListeVisite";
+import VisitesPage from "./pages/Visite/pages/VisitesPage";
 import ClientQrCode from "./pages/Clients/pages/QrCode";
 import Dashboard from "./pages/Dashboard/Dashboard";
 
@@ -31,7 +32,7 @@ export default function App() {
           </Route>
           <Route path="visite" element={<Visite />} >
             <Route index element={<Navigate to="ajout" replace />} />
-            <Route path="ajout" element={<AjoutVisite />} />
+            <Route path="ajout" element={<VisitesPage  />} />
             <Route path="liste">
               <Route index element={<ListeVisite />} />
               <Route path=":id" element={<ListeVisite />} />
