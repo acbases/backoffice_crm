@@ -86,9 +86,35 @@ export default function AjoutClient() {
   };
 
   return (
+    <div
+        className="relative flex min-h-full items-center justify-center overflow-hidden p-4"
+        style={{ backgroundColor: "#fafafa" }}
+    >
+        {/* Cercles décoratifs de tailles variées */}
+        <div
+    className="pointer-events-none absolute inset-0"
+    style={{
+        backgroundImage: `
+            radial-gradient(circle at 15% 20%, rgba(239,68,68,0.18), transparent 35%),
+            radial-gradient(circle at 85% 15%, rgba(59,130,246,0.15), transparent 35%),
+            radial-gradient(circle at 20% 85%, rgba(251,191,36,0.15), transparent 35%),
+            radial-gradient(circle at 90% 80%, rgba(239,68,68,0.12), transparent 35%),
+            radial-gradient(circle at 50% 50%, rgba(239,68,68,0.06), transparent 50%)
+        `,
+    }}
+/>
+
+<div
+    className="pointer-events-none absolute inset-0 opacity-40"
+    style={{
+        backgroundImage:
+            "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0)",
+        backgroundSize: "28px 28px",
+    }}
+/>
     <form
       onSubmit={handleSubmit}
-      className="m-4 max-w-xl space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+      className="relative w-full max-w-xl space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-lg"
     >
       <div>
         <h2 className="text-lg font-semibold text-gray-900">Ajouter un client</h2>
@@ -219,5 +245,6 @@ export default function AjoutClient() {
         {loading ? "En cours..." : "Enregistrer client"}
       </button>
     </form>
+    </div>
   );
 }

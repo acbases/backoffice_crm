@@ -165,8 +165,8 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
             <div className="grid grid-cols-7 gap-px rounded-lg border border-gray-200 bg-gray-200 text-xs font-medium text-gray-500 overflow-visible">
                 {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((label) => (
                     <div key={label} className="bg-gradient-to-r
-                        from-red-600
-                        to-red-500
+                        from-blue-600
+                        to-blue-500
                         px-2
                         py-3
                         text-center
