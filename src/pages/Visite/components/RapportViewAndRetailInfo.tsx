@@ -3,6 +3,7 @@ import {
     Boxes,
     Tag,
     ClipboardList,
+    Image as ImageIcon,
 } from "lucide-react";
 
 import {
@@ -192,6 +193,26 @@ function RapportViewAndRetailInfo({
                         <p className="text-gray-500">Aucun PLV.</p>
                     )}
                 </div>
+                {/* Photo */}
+                {rapportRetail?.sary && (
+                    <div className="bg-white border rounded-xl overflow-y-auto">
+                        <div className="flex items-center gap-2 mb-4">
+                            <ImageIcon
+                                size={18}
+                                className="text-pink-500"
+                            />
+                            <h3 className="font-semibold">
+                                Pièce jointe
+                            </h3>
+                        </div>
+
+                        <img
+                            src={rapportRetail.sary}
+                            alt="Rapport"
+                            className="rounded-lg border max-h-96 object-cover"
+                        />
+                    </div>
+                )}
             </div>
             {/* Rapport Retail */}
         </div>

@@ -119,6 +119,7 @@ export type RapportRetailItem = {
   autre_plv: string;
   created_at: string | null;
   updated_at: string | null;
+  sary: string | null;
 };
 
 export async function getRapportRetailByIdVisite(
@@ -127,6 +128,7 @@ export async function getRapportRetailByIdVisite(
   const { data } = await api.get<RapportRetailItem[]>(
     `/getRapportByIdVisite/${idVisite}`
   );
+  console.log("Rapport retail data:", data);
 
   return data.length > 0 ? data[0] : null;
 }
