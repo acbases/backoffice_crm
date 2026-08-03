@@ -61,6 +61,7 @@ export default function ListeClient() {
   const quartierFilter = searchParams.get("quartier") ?? "";
   const categorieFilter = searchParams.get("categorie") ?? "";
   const nomFilter = searchParams.get("nom") ?? "";
+  
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
     if (value) {

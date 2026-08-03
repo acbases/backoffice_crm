@@ -52,6 +52,7 @@ export default function AjoutClient() {
 
     loadCategorieAgenceData();
   }, []);
+  
   const handleChange = (
     field: keyof typeof initialForm,
     value: string
