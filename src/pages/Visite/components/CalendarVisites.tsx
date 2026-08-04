@@ -1,5 +1,8 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { getVisites, type VisitesItem } from "../api/visiteApi";
+import { getVisiteByIdUser } from "../api/visiteApi";
+
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 type CalendarVisitesProps = {
     refreshKey?: number; // incrémenté par le parent pour forcer un refetch
@@ -18,6 +21,7 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [currentMonth, setCurrentMonth] = useState(() => new Date());
+    const { user, isAdmin } = useCurrentUser();
     const [hoveredVisite, setHoveredVisite] = useState<{
         visite: VisitesItem;
         x: number;
@@ -32,8 +36,13 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
         setLoading(true);
         setError("");
         try {
-            const data = await getVisites();
+
+            const data = isAdmin
+                    ? await getVisites()
+                    : await getVisiteByIdUser(user.id);
+
             setVisites(data);
+
             console.log("Visites chargées :", data);
         } catch (err) {
             console.error("Erreur chargement visites :", err);
@@ -41,7 +50,7 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [user, isAdmin]);
 
     useEffect(() => {
         loadVisites();

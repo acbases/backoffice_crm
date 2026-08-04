@@ -74,6 +74,11 @@ export async function getVisiteById(id: number) {
   return data;
 }
 
+export async function getVisiteByIdUser(id: number) {
+  const { data } = await api.get<VisiteItem[]>(`/visiteByIdUtilisateur/${id}`);
+  return data;
+}
+
 export async function getVisites() {
   const { data } = await api.get<VisiteItem[]>("/visite");
   return data;

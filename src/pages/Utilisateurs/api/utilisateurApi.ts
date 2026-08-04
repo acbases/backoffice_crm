@@ -27,3 +27,15 @@ export async function getUsers() {
     )
   );
 }
+
+export async function getUserByID(id: number) {
+  const { data } = await api.get<UserItem>(`/user/${id}`);
+
+  return data;
+}     
+
+export async function getUserByMatricule(matricule: string) {
+  const { data } = await api.get<UserItem>(`/userByMatricule/${matricule}`);
+
+  return data;
+}  

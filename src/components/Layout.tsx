@@ -68,8 +68,9 @@ export default function Layout() {
 
   const navItems = [
     // { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-    { name: "Client", path: "/client", icon: UserStar },
     { name: "Visite", path: "/visite", icon: MapPinPen },
+    { name: "Client", path: "/client", icon: UserStar },
+    
   ];
 
   const sidebarVariants = {

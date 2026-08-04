@@ -10,18 +10,47 @@ import ListeVisite from "./pages/Visite/pages/ListeVisite";
 import VisitesPage from "./pages/Visite/pages/VisitesPage";
 import ClientQrCode from "./pages/Clients/pages/QrCode";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import { UserProvider } from "./context/UserContext";
+import { useCurrentUser } from "./hooks/useCurrentUser";
 
+function RequireAdmin({ children }: { children: React.ReactNode }) {
+    const { isAdmin, loading } = useCurrentUser();
+
+    if (loading) return null; // ou un loader
+
+    if (!isAdmin) {
+        return <Navigate to="/client/liste" replace />;
+    }
+
+    return <>{children}</>;
+}
+
+function ClientIndexRedirect() {
+    const { isAdmin, loading } = useCurrentUser();
+
+    if (loading) return null;
+
+    return <Navigate to={isAdmin ? "ajout" : "liste"} replace />;
+}
 
 export default function App() {
   
   return (
+    <UserProvider>
     <Router basename="/crm_admin">
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="client" replace />} />
+          <Route index element={<Navigate to="visite" replace />} />
           <Route path="client" element={<Clients />}>
-            <Route index element={<Navigate to="ajout" replace />} />
-            <Route path="ajout" element={<AjoutClient />} />
+            <Route index element={<ClientIndexRedirect />} />
+            <Route
+              path="ajout"
+              element={
+                <RequireAdmin>
+                  <AjoutClient />
+                </RequireAdmin>
+              }
+            />
             <Route path="liste">
               <Route index element={<ListeClient />} />
               <Route path=":id" element={<ListeClient />} />
@@ -42,5 +71,6 @@ export default function App() {
         </Route>
       </Routes>
     </Router>
+    </UserProvider>
   );
 }

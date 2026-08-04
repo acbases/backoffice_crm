@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { getClients, type ClientItem } from "./api/clientApi";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export type ClientsContext = {
   clients: ClientItem[];
@@ -15,6 +16,7 @@ export default function Clients() {
   const [clients, setClients] = useState<ClientItem[]>([]);
   const [selectedClientId, setSelectedClientId] = useState("");
   const [loading, setLoading] = useState(false);
+  const { isAdmin } = useCurrentUser();
 
   const loadClients = useCallback(async () => {
     setLoading(true);
@@ -40,17 +42,19 @@ export default function Clients() {
         <div className="shrink-0 space-y-2 pr-4">
           <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
         </div>
-        <NavLink
-          to="ajout"
-          className={({ isActive }) =>
-            `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
-              ? "bg-red-100 text-red-600"
-              : "bg-white text-gray-600 hover:bg-gray-100"
-            }`
-          }
-        >
-          Ajout
-        </NavLink>
+        {isAdmin && (
+          <NavLink
+            to="ajout"
+            className={({ isActive }) =>
+              `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
+                ? "bg-red-100 text-red-600"
+                : "bg-white text-gray-600 hover:bg-gray-100"
+              }`
+            }
+          >
+            Ajout
+          </NavLink>
+        )}
         <NavLink
           to={`liste${location.search}`}
           className={({ isActive }) =>

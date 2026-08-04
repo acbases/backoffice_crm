@@ -13,11 +13,14 @@ import VisiteFilters from "../components/VisiteFilter";
 import { getUsers, type UserItem } from "@/pages/Utilisateurs/api/utilisateurApi";
 import { getTypeVisites, type TypeVisiteItem } from "../api/typeVisiteApi";
 import { getCategorieVisites, type CategorieVisiteItem } from "../api/categorieVisiteApi";
+import { getVisiteByIdUser } from "../api/visiteApi";
 import { getZones } from "@/pages/Clients/api/zoneApi";
 import { getQuartiers } from "@/pages/Clients/api/quartierApi";
 import { File, SquareArrowOutUpRight } from "lucide-react";
 
 import { exportVisitesToExcel } from "../utils/ExportVisitesToExcel";
+
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 function ListeVisite() {
     // visites states
@@ -27,13 +30,21 @@ function ListeVisite() {
     const [error, setError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
+
+    const { user, isAdmin } = useCurrentUser();
+
     // visites loading
     useEffect(() => {
+        if (!user) return; // attend que l'utilisateur soit chargé pour connaître son id/rôle
+
         const loadVisite = async () => {
             setLoading(true);
             setError("");
             try {
-                const data = await getVisites();
+                const data = isAdmin
+                    ? await getVisites()
+                    : await getVisiteByIdUser(user.id);
+
                 setVisites(data);
 
             } catch {
@@ -43,7 +54,7 @@ function ListeVisite() {
             }
         };
         loadVisite();
-    }, [setVisites]);
+    }, [setVisites, user, isAdmin]);
 
     // filters data state 
     const [clientsOptions, setClientsOptions] = useState<ClientItem[]>([])
