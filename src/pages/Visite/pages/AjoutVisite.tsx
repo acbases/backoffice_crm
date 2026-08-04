@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { createVisite } from "../api/visiteApi";
@@ -7,6 +7,7 @@ import { getUsers, type UserItem } from '@/pages/Utilisateurs/api/utilisateurApi
 import { getTypeVisites, type TypeVisiteItem } from '../api/typeVisiteApi';
 import { getCategorieVisites, type CategorieVisiteItem } from '../api/categorieVisiteApi';
 import { getVisites, type VisitesItem } from "../api/visiteApi";
+
 const initialForm = {
     idclient: "",
     idutilisateur: "",
@@ -33,6 +34,13 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
     const [utilisateurs, setUtilisateurs] = useState<UserItem[]>([])
     const [typeVisites, setTypeVisites] = useState<TypeVisiteItem[]>([])
     const [categorieVisites, setCategorieVisites] = useState<CategorieVisiteItem[]>([])
+
+    // ===== Autocomplete client =====
+    const [clientSearch, setClientSearch] = useState("");
+    const [clientSuggestions, setClientSuggestions] = useState<ClientItem[]>([]);
+    const [showClientSuggestions, setShowClientSuggestions] = useState(false);
+    const clientFieldRef = useRef<HTMLDivElement | null>(null);
+
     useEffect(() => {
         const loadCategorieAgenceData = async () => {
             try {
@@ -55,12 +63,50 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
         loadCategorieAgenceData();
     }, []);
 
+    // fermer les suggestions si clic en dehors du champ
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                clientFieldRef.current &&
+                !clientFieldRef.current.contains(event.target as Node)
+            ) {
+                setShowClientSuggestions(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     // gerer le changement d'etat sur chaque input
     const handleChange = (
         field: keyof typeof initialForm,
         value: string
     ) => {
         setForm((current) => ({ ...current, [field]: value }));
+    };
+
+    const handleClientSearchChange = (text: string) => {
+        setClientSearch(text);
+        handleChange("idclient", ""); // reset la sélection tant qu'on retape
+
+        if (text.trim().length > 0) {
+            const filtered = clients.filter((c) =>
+                c.nom.toLowerCase().includes(text.toLowerCase())
+            );
+            setClientSuggestions(filtered);
+            setShowClientSuggestions(true);
+        } else {
+            setClientSuggestions([]);
+            setShowClientSuggestions(false);
+        }
+    };
+
+    const selectClient = (client: ClientItem) => {
+        handleChange("idclient", String(client.id));
+        setClientSearch(client.nom);
+        setClientSuggestions([]);
+        setShowClientSuggestions(false);
     };
 
     // submit handlers
@@ -82,6 +128,7 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
             });
 
             setForm(initialForm);
+            setClientSearch("");
         } catch {
             setError("Unable to save the visite.");
             setLoading(false);
@@ -115,25 +162,50 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
             ) : null}
 
             <div className="grid gap-4 md:grid-cols-2">
-                <label className="block space-y-1">
+                <div className="block space-y-1 relative" ref={clientFieldRef}>
                     <span className="text-sm font-medium text-gray-700">
                         Clients
                     </span>
-                    <select
-                        value={form.idclient}
-                        onChange={(event) => handleChange("idclient", event.target.value)}
+                    <input
+                        type="text"
+                        value={clientSearch}
+                        onChange={(event) => handleClientSearchChange(event.target.value)}
+                        onFocus={() => {
+                            if (clientSearch.trim().length > 0) {
+                                setShowClientSuggestions(true);
+                            }
+                        }}
+                        placeholder="Rechercher un client..."
                         className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
+                        autoComplete="off"
                         required
-                    >
-                        <option value="">Sélectionner un client</option>
+                    />
+                    {/* input caché pour garder la validation required native sur idclient */}
+                    <input type="hidden" value={form.idclient} required />
 
-                        {clients.map((client) => (
-                            <option key={client.id} value={client.id}>
-                                {client.nom}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+                    {showClientSuggestions && clientSuggestions.length > 0 && (
+                        <div className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+                            {clientSuggestions.map((client) => (
+                                <button
+                                    type="button"
+                                    key={client.id}
+                                    onClick={() => selectClient(client)}
+                                    className="block w-full px-3 py-2 text-left text-sm hover:bg-gray-100"
+                                >
+                                    {client.nom}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {showClientSuggestions &&
+                        clientSearch.trim().length > 0 &&
+                        clientSuggestions.length === 0 && (
+                            <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-500 shadow-lg">
+                                Aucun client trouvé
+                            </div>
+                        )}
+                </div>
 
                 <label className="block space-y-1">
                     <span className="text-sm font-medium text-gray-700">
