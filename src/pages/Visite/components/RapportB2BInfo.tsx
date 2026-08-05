@@ -29,7 +29,13 @@ function RapportB2BInfo({
     }
 
     if (!rapport) {
-        return 
+        return (
+            <div className="p-6">
+                <p className="text-gray-500">
+                    Cette visite n'a pas encore de rapport B2B.
+                </p>
+            </div>
+        );
     }
 
     return (

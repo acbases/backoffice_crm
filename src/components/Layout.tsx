@@ -8,7 +8,8 @@ import {
   ChevronRight,
   UserStar,
   MapPinPen,
-  Users
+  Users,
+  LayoutDashboard
 } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
@@ -70,10 +71,10 @@ export default function Layout() {
   }, []);
 
   const navItems = [
-    // { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
     { name: "Visite", path: "/visite", icon: MapPinPen },
     { name: "Client", path: "/client", icon: UserStar },
     ...(isAdmin ? [{ name: "Utilisateur", path: "/utilisateur", icon: Users }] : []),
+    ...(isAdmin ? [{ name: "Dashboard", path: "/dashboard", icon: LayoutDashboard }] : []),
   ];
 
   const sidebarVariants = {

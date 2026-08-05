@@ -128,7 +128,7 @@ function DetailVisite({ id, onClose }: DetailVisiteProps) {
                 <VisiteInfo visite={selectedVisite} />
 
                 {/* report detail */}
-                {rapportB2B ? (
+                {selectedVisite.client.categorie_client.statut === "B2B" ? (
                     <RapportB2BInfo
                         rapport={rapportB2B}
                         loading={loadingRapportB2B}

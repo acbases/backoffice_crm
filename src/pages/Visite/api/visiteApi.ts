@@ -49,6 +49,7 @@ export type VisiteItem = {
     categorie_client: {
       id: number;
       intitule: string;
+      statut: string;
     };
   };
   categorie_visite: {

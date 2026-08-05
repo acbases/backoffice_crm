@@ -6,7 +6,8 @@ import { getClients, type ClientItem } from '@/pages/Clients/api/clientApi';
 import { getUsers, type UserItem } from '@/pages/Utilisateurs/api/utilisateurApi';
 import { getTypeVisites, type TypeVisiteItem } from '../api/typeVisiteApi';
 import { getCategorieVisites, type CategorieVisiteItem } from '../api/categorieVisiteApi';
-import { getVisites, type VisitesItem } from "../api/visiteApi";
+import { getVisites, type VisiteItem } from "../api/visiteApi";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const initialForm = {
     idclient: "",
@@ -28,7 +29,8 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
     const [form, setForm] = useState(initialForm);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    
+    const { user: currentUser, isAdmin } = useCurrentUser();
+
     // get all client, utilisateurs, typeVisite et categoriVisite pour liste deroulantes formulaire visite
     const [clients, setClients] = useState<ClientItem[]>([])
     const [utilisateurs, setUtilisateurs] = useState<UserItem[]>([])
@@ -62,6 +64,13 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
 
         loadCategorieAgenceData();
     }, []);
+
+    // un simple utilisateur ne choisit pas l'utilisateur : la visite lui est assignée automatiquement
+    useEffect(() => {
+        if (!isAdmin && currentUser) {
+            setForm((current) => ({ ...current, idutilisateur: String(currentUser.id) }));
+        }
+    }, [isAdmin, currentUser]);
 
     // fermer les suggestions si clic en dehors du champ
     useEffect(() => {
@@ -209,22 +218,28 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
 
                 <label className="block space-y-1">
                     <span className="text-sm font-medium text-gray-700">
-                        Utilisateur
+                        Commerciale
                     </span>
-                    <select
-                        value={form.idutilisateur}
-                        onChange={(event) => handleChange("idutilisateur", event.target.value)}
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
-                        required
-                    >
-                        <option value="">Sélectionner un utilisateur</option>
+                    {isAdmin ? (
+                        <select
+                            value={form.idutilisateur}
+                            onChange={(event) => handleChange("idutilisateur", event.target.value)}
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
+                            required
+                        >
+                            <option value="">Sélectionner un utilisateur</option>
 
-                        {utilisateurs.map((user) => (
-                            <option key={user.id} value={user.id}>
-                                {`${user.firstname} ${user.name}`}
-                            </option>
-                        ))}
-                    </select>
+                            {utilisateurs.map((user) => (
+                                <option key={user.id} value={user.id}>
+                                    {`${user.firstname} ${user.name}`}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <div className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700">
+                            {currentUser ? `${currentUser.firstname} ${currentUser.name}` : "..."}
+                        </div>
+                    )}
                 </label>
             </div>
 
@@ -307,7 +322,7 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
 
             <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || (!isAdmin && !currentUser)}
                 className="rounded-lg bg-green-200 px-4 py-2 text-sm font-medium hover:bg-green-300 disabled:cursor-not-allowed disabled:opacity-70"
             >
                 {loading ? "En cours..." : "Enregistrer visite"}
