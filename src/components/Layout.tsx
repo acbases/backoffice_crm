@@ -7,8 +7,10 @@ import {
   ChevronLeft,
   ChevronRight,
   UserStar,
-  MapPinPen
+  MapPinPen,
+  Users
 } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 interface NavItemProps {
   key?: React.Key;
@@ -54,6 +56,7 @@ const NavItem = ({ item, isCollapsed, onClick }: NavItemProps) => (
 export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAdmin } = useUser();
 
   // Close mobile menu on larger screens
   useEffect(() => {
@@ -70,7 +73,7 @@ export default function Layout() {
     // { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
     { name: "Visite", path: "/visite", icon: MapPinPen },
     { name: "Client", path: "/client", icon: UserStar },
-    
+    ...(isAdmin ? [{ name: "Utilisateur", path: "/utilisateur", icon: Users }] : []),
   ];
 
   const sidebarVariants = {

@@ -42,6 +42,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
         getUserByMatricule(resolvedMatricule)
             .then((data) => {
+                if (!data || !data.id) {
+                    setError(true);
+                    return;
+                }
                 setUser(data);
             })
             .catch((err) => {

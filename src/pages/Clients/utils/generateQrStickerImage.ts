@@ -1,28 +1,29 @@
-type GenerateA4QrImageParams = {
+type GenerateQrStickerImageParams = {
   qrUrl: string;
   clientName: string;
   logoUrl?: string;
 };
 
-export const generateA4QrImage = async ({
+export const generateQrStickerImage = async ({
   qrUrl,
   clientName,
   logoUrl = "/crm_admin/logo-ac.png",
-}: GenerateA4QrImageParams) => {
+}: GenerateQrStickerImageParams) => {
   const canvas = document.createElement("canvas");
 
-  const A4_WIDTH = 2480;
-  const A4_HEIGHT = 3508;
+  // Format autocollant (~5x6cm à 300dpi), pas au format A4.
+  const STICKER_WIDTH = 600;
+  const STICKER_HEIGHT = 750;
 
-  canvas.width = A4_WIDTH;
-  canvas.height = A4_HEIGHT;
+  canvas.width = STICKER_WIDTH;
+  canvas.height = STICKER_HEIGHT;
 
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
   // White background
   ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+  ctx.fillRect(0, 0, STICKER_WIDTH, STICKER_HEIGHT);
 
   // Load QR image
   const qrImg = new Image();
@@ -42,31 +43,31 @@ export const generateA4QrImage = async ({
   ]);
 
   // QR
-  const qrSize = 1800;
+  const qrSize = 450;
 
   ctx.drawImage(
     qrImg,
-    (A4_WIDTH - qrSize) / 2,
-    150,
+    (STICKER_WIDTH - qrSize) / 2,
+    40,
     qrSize,
     qrSize
   );
 
   // Client name
   ctx.fillStyle = "#000";
-  ctx.font = "bold 80px Arial";
+  ctx.font = "bold 28px Arial";
   ctx.textAlign = "center";
 
-  ctx.fillText(clientName, A4_WIDTH / 2, 2100);
+  ctx.fillText(clientName, STICKER_WIDTH / 2, 530);
 
   // Logo
-  const logoWidth = 1300;
-  const logoHeight = 900;
+  const logoWidth = 220;
+  const logoHeight = 152;
 
   ctx.drawImage(
     logoImg,
-    (A4_WIDTH - logoWidth) / 2,
-    2200,
+    (STICKER_WIDTH - logoWidth) / 2,
+    570,
     logoWidth,
     logoHeight
   );
@@ -76,6 +77,6 @@ export const generateA4QrImage = async ({
 
   const link = document.createElement("a");
   link.href = output;
-  link.download = `${clientName}-A4-QR.png`;
+  link.download = `${clientName}-QR-autocollant.png`;
   link.click();
 };

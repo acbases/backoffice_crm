@@ -47,7 +47,7 @@ export async function getUserByMatricule(matricule: string) {
 
 export async function updateRoleUser(id: number, role_crm: string) {
 
-  const { data } = await api.post<UserItem>(`/update-role/${id}`, { role_crm });
+  const { data } = await api.post<UserItem>(`/update-role`, { id, role_crm });
   return data;
 
 }

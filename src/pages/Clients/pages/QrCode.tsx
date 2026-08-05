@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useOutletContext, useParams, useNavigate } from "react-router-dom";
 import type { ClientsContext } from "../Clients";
 import { getClientQrCode, updateClient } from "../api/clientApi";
-import { generateA4QrImage } from "../utils/generateA4QrImage";
+import { generateQrStickerImage } from "../utils/generateQrStickerImage";
 
 const getQuartierLabel = (quartier: string | { intitule: string }) =>
   typeof quartier === "object" ? quartier.intitule : quartier;
@@ -258,7 +258,7 @@ export default function ClientQrCode() {
               <div className="w-full flex items-center justify-between space-x-2">
                 <button
                   onClick={() =>
-                    generateA4QrImage({
+                    generateQrStickerImage({
                       qrUrl,
                       clientName: selectedClient.nom,
                     })

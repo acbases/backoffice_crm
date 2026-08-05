@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Navigate, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Visite from "./pages/Visite/Visite";
-import Clients from "./pages/Clients/Clients";
+import Clients, { ClientIndexRedirect, RequireAdmin } from "./pages/Clients/Clients";
 import AjoutClient from "./pages/Clients/pages/AjoutClient";
 import ListeClient from "./pages/Clients/pages/ListeClient";
 import MapsClient from "./pages/Clients/pages/MapsClient";
@@ -10,6 +10,10 @@ import ListeVisite from "./pages/Visite/pages/ListeVisite";
 import VisitesPage from "./pages/Visite/pages/VisitesPage";
 import ClientQrCode from "./pages/Clients/pages/QrCode";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import Utilisateurs from "./pages/Utilisateurs/Utilisateur";
+import Ajout from "./pages/Utilisateurs/pages/Ajout";
+import Liste from "./pages/Utilisateurs/pages/Liste";
+import ModifRole from "./pages/Utilisateurs/pages/ModifRole";
 import { useEffect, useState } from "react";
 import { UserProvider } from "./context/UserContext";
 
@@ -23,8 +27,8 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="visite" replace />} />
           <Route path="client" element={<Clients />}>
-            <Route index element={<Navigate to="ajout" replace />} />
-            <Route path="ajout" element={<AjoutClient />} />
+            <Route index element={<ClientIndexRedirect />} />
+            <Route path="ajout" element={<RequireAdmin><AjoutClient /></RequireAdmin>} />
             <Route path="liste">
               <Route index element={<ListeClient />} />
               <Route path=":id" element={<ListeClient />} />
@@ -40,6 +44,12 @@ export default function App() {
               <Route index element={<ListeVisite />} />
               <Route path=":id" element={<ListeVisite />} />
             </Route>
+          </Route>
+          <Route path="utilisateur" element={<Utilisateurs />}>
+            <Route index element={<Navigate to="liste" replace />} />
+            <Route path="liste" element={<Liste />} />
+            <Route path="ajout" element={<Ajout />} />
+            <Route path="modifRole" element={<ModifRole />} />
           </Route>
           <Route path="dashboard" element={<Dashboard />} />
         </Route>

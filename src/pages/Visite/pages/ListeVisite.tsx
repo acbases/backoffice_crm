@@ -47,8 +47,14 @@ function ListeVisite() {
 
                 setVisites(data);
 
-            } catch {
-                setError("Unable to load visites.");
+            } catch (err) {
+                if (!isAdmin) {
+                    // L'utilisateur n'a simplement aucune visite : pas une erreur.
+                    setVisites([]);
+                } else {
+                    console.error("Erreur chargement visites :", err);
+                    setError("Unable to load visites.");
+                }
             } finally {
                 setLoading(false);
             }

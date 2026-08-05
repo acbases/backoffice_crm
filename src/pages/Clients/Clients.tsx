@@ -1,7 +1,20 @@
-import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { useState, useEffect, useCallback, type Dispatch, type SetStateAction, type ReactNode } from "react";
+import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
 import { getClients, type ClientItem } from "./api/clientApi";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+
+export function ClientIndexRedirect() {
+  const { isAdmin, loading } = useCurrentUser();
+  if (loading) return null;
+  return <Navigate to={isAdmin ? "ajout" : "liste"} replace />;
+}
+
+export function RequireAdmin({ children }: { children: ReactNode }) {
+  const { isAdmin, loading } = useCurrentUser();
+  if (loading) return null;
+  if (!isAdmin) return <Navigate to="/client/liste" replace />;
+  return <>{children}</>;
+}
 
 export type ClientsContext = {
   clients: ClientItem[];

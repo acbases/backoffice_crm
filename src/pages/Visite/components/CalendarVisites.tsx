@@ -33,10 +33,11 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
     } | null>(null);
 
     const loadVisites = useCallback(async () => {
+        if (!user) return; // attend que l'utilisateur soit chargé pour connaître son id/rôle
+
         setLoading(true);
         setError("");
         try {
-
             const data = isAdmin
                     ? await getVisites()
                     : await getVisiteByIdUser(user.id);
@@ -45,8 +46,13 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
 
             console.log("Visites chargées :", data);
         } catch (err) {
-            console.error("Erreur chargement visites :", err);
-            setError("Impossible de charger les visites.");
+            if (!isAdmin) {
+                // L'utilisateur n'a simplement aucune visite : pas une erreur.
+                setVisites([]);
+            } else {
+                console.error("Erreur chargement visites :", err);
+                setError("Impossible de charger les visites.");
+            }
         } finally {
             setLoading(false);
         }

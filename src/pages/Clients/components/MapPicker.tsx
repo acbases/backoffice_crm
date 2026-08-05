@@ -35,7 +35,18 @@ export default function MapPicker({
                 );
             }}
         >
-            <Marker position={{ lat, lng }} />
+            <Marker
+                position={{ lat, lng }}
+                draggable
+                onDragEnd={(e) => {
+                    if (!e.latLng) return;
+
+                    onChange(
+                        e.latLng.lat(),
+                        e.latLng.lng()
+                    );
+                }}
+            />
         </GoogleMap>
     );
 }

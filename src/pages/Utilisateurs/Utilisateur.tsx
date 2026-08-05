@@ -1,28 +1,28 @@
 import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { getUsers, type UtilisateurItem } from "./api/utilisateurApi";
+import { getUsers, type UserItem } from "./api/utilisateurApi";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
-export type ClientsContext = {
-  utilisateur: UtilisateurItem[];
-  setUtilisateur: Dispatch<SetStateAction<UtilisateurItem[]>>;
+export type UtilisateursContext = {
+  utilisateurs: UserItem[];
+  setUtilisateurs: Dispatch<SetStateAction<UserItem[]>>;
   selectedUtilisateurId: string;
   setSelectedUtilisateurId: (id: string) => void;
-  loadUtilisateur: () => Promise<void>;
+  loadUtilisateurs: () => Promise<void>;
   loading: boolean;
 };
 
 export default function Utilisateurs() {
-  const [clients, setClients] = useState<UtilisateurItem[]>([]);
-  const [selectedClientId, setSelectedClientId] = useState("");
+  const [utilisateurs, setUtilisateurs] = useState<UserItem[]>([]);
+  const [selectedUtilisateurId, setSelectedUtilisateurId] = useState("");
   const [loading, setLoading] = useState(false);
   const { isAdmin } = useCurrentUser();
 
-  const loadClients = useCallback(async () => {
+  const loadUtilisateurs = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getUsers();
-      setClients(data);
+      setUtilisateurs(data);
     } catch (error) {
       console.error("Failed to load users:", error);
     } finally {
@@ -31,18 +31,32 @@ export default function Utilisateurs() {
   }, []);
 
   useEffect(() => {
-    loadClients();
-  }, [loadClients]);
+    loadUtilisateurs();
+  }, [loadUtilisateurs]);
 
   const location = useLocation();
+
   return (
-    <div id="Clients-page" className="flex flex-col h-screen overflow-hidden space-y-0">
+    <div id="Utilisateurs-page" className="flex flex-col h-screen overflow-hidden space-y-0">
 
       <div className="shrink-0 flex flex-wrap gap-2 p-3 mt-1.5">
         <div className="shrink-0 space-y-2 pr-4">
           <h1 className="text-2xl font-bold text-gray-900">Utilisateurs</h1>
         </div>
-        
+
+        <NavLink
+          to={`liste${location.search}`}
+          className={({ isActive }) =>
+            `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
+              ? "bg-red-100 text-red-600"
+              : "bg-white text-gray-600 hover:bg-gray-100"
+            }`
+          }
+        >
+          Liste
+        </NavLink>
+
+        {isAdmin && (
           <NavLink
             to="ajout"
             className={({ isActive }) =>
@@ -54,38 +68,30 @@ export default function Utilisateurs() {
           >
             Ajout
           </NavLink>
-        
-        <NavLink
-          to={`liste`}
-          className={({ isActive }) =>
-            `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
-              ? "bg-red-100 text-red-600"
-              : "bg-white text-gray-600 hover:bg-gray-100"
-            }`
-          }
-        >
-          Liste
-        </NavLink>
-        <NavLink
-          to={`modifRole`}
-          className={({ isActive }) =>
-            `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
-              ? "bg-red-100 text-red-600"
-              : "bg-white text-gray-600 hover:bg-gray-100"
-            }`
-          }
-        >
-          Liste
-        </NavLink>
+        )}
+
+        {isAdmin && (
+          <NavLink
+            to="modifRole"
+            className={({ isActive }) =>
+              `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isActive
+                ? "bg-red-100 text-red-600"
+                : "bg-white text-gray-600 hover:bg-gray-100"
+              }`
+            }
+          >
+            Modif Role
+          </NavLink>
+        )}
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto">
         <Outlet
           context={{
-            clients,
-            setClients,
-            selectedClientId,
-            setSelectedClientId,
-            loadClients,
+            utilisateurs,
+            setUtilisateurs,
+            selectedUtilisateurId,
+            setSelectedUtilisateurId,
+            loadUtilisateurs,
             loading,
           }}
         />
