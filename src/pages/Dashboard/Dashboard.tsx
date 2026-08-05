@@ -3,7 +3,7 @@ import { getVisites, type VisiteItem } from "@/pages/Visite/api/visiteApi";
 import { getUsers, type UserItem } from "@/pages/Utilisateurs/api/utilisateurApi";
 import TimeSeriesCard from "./components/TimeSeriesCard";
 import CompletionRateCard from "./components/CompletionRateCard";
-import { buildTimeline, countVisitesByBucket, type Granularity } from "./utils/aggregateVisites";
+import { buildTimeline, bucketKey, countVisitesByBucket, type Granularity } from "./utils/aggregateVisites";
 
 export default function Dashboard() {
   const [visites, setVisites] = useState<VisiteItem[]>([]);
@@ -73,6 +73,20 @@ export default function Dashboard() {
     [visitesEmploye, granulariteEmploye, timelineEmploye]
   );
 
+  const visitesEmployeFenetre = useMemo(
+    () =>
+      visitesEmploye.filter(
+        (v) => v.date && timelineEmploye.includes(bucketKey(v.date, granulariteEmploye))
+      ),
+    [visitesEmploye, timelineEmploye, granulariteEmploye]
+  );
+  const nonEffectueesEmploye = useMemo(
+    () => visitesEmployeFenetre.filter((v) => v.statut !== 1).length,
+    [visitesEmployeFenetre]
+  );
+  const nonEffectueesEmployePercent =
+    visitesEmployeFenetre.length > 0 ? (nonEffectueesEmploye / visitesEmployeFenetre.length) * 100 : 0;
+
   if (loading) {
     return (
       <div className="m-4 rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-500">
@@ -141,6 +155,15 @@ export default function Dashboard() {
               </option>
             ))}
           </select>
+        }
+        extraStats={
+          <div className="flex items-center gap-2 text-sm">
+            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#9ca3af" }} />
+            <span className="text-gray-600">Planifiées non effectuées</span>
+            <span className="font-semibold text-gray-900">
+              {nonEffectueesEmploye.toLocaleString("fr-FR")} ({nonEffectueesEmployePercent.toFixed(0)}%)
+            </span>
+          </div>
         }
       />
     </div>

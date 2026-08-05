@@ -11,6 +11,7 @@ type TimeSeriesCardProps = {
   onGranularityChange: (granularity: Granularity) => void;
   color: string;
   extraControls?: ReactNode;
+  extraStats?: ReactNode;
 };
 
 export default function TimeSeriesCard({
@@ -21,6 +22,7 @@ export default function TimeSeriesCard({
   onGranularityChange,
   color,
   extraControls,
+  extraStats,
 }: TimeSeriesCardProps) {
   const [showTable, setShowTable] = useState(false);
   const total = useMemo(() => data.reduce((sum, d) => sum + d.value, 0), [data]);
@@ -47,6 +49,8 @@ export default function TimeSeriesCard({
       </div>
 
       <p className="mb-3 text-3xl font-semibold text-gray-900">{total.toLocaleString("fr-FR")}</p>
+
+      {extraStats && <div className="mb-3">{extraStats}</div>}
 
       {showTable ? (
         <div className="max-h-64 overflow-y-auto rounded-lg border border-gray-100">
