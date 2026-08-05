@@ -28,6 +28,11 @@ export async function getUsers() {
   );
 }
 
+export  async function createUser() {
+  const { data } = await api.post<UserItem>("/user");
+  return data;
+}
+
 export async function getUserByID(id: number) {
   const { data } = await api.get<UserItem>(`/user/${id}`);
 
@@ -39,3 +44,10 @@ export async function getUserByMatricule(matricule: string) {
 
   return data;
 }  
+
+export async function updateRoleUser(id: number, role_crm: string) {
+
+  const { data } = await api.post<UserItem>(`/update-role/${id}`, { role_crm });
+  return data;
+
+}
