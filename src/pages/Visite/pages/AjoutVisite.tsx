@@ -218,16 +218,16 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
 
                 <label className="block space-y-1">
                     <span className="text-sm font-medium text-gray-700">
-                        Commerciale
+                        Commercial
                     </span>
                     {isAdmin ? (
                         <select
                             value={form.idutilisateur}
                             onChange={(event) => handleChange("idutilisateur", event.target.value)}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-red-500"
                             required
                         >
-                            <option value="">Sélectionner un utilisateur</option>
+                            <option value="">Commercial</option>
 
                             {utilisateurs.map((user) => (
                                 <option key={user.id} value={user.id}>
@@ -251,10 +251,10 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
                     <select
                         value={form.idcategorie}
                         onChange={(event) => handleChange("idcategorie", event.target.value)}
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-red-500"
                         required
                     >
-                        <option value="">Sélectionner un categorie</option>
+                        <option value="">Catégorie</option>
 
                         {categorieVisites.map((catVisite) => (
                             <option key={catVisite.id} value={catVisite.id}>
@@ -291,10 +291,10 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
                     <select
                         value={form.idtype}
                         onChange={(event) => handleChange("idtype", event.target.value)}
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-red-500"
                         required
                     >
-                        <option value="">Sélectionner un type</option>
+                        <option value="">Type</option>
 
                         {typeVisites.map((typeVisite) => (
                             <option key={typeVisite.id} value={typeVisite.id}>

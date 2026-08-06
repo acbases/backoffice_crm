@@ -9,7 +9,8 @@ import { getCategorieClients, type categorieClientItem } from "../api/categorieC
 import { getQuartiers } from "../api/quartierApi";
 import { getZones } from "../api/zoneApi";
 import ClientInfoModal from "../components/ClientInfoModal";
-import { SquareArrowOutUpRight } from "lucide-react";
+import { SquareArrowOutUpRight, File } from "lucide-react";
+import { exportClientsToExcel } from "../utils/exportClientsToExcel";
 
 type QrCodeFilter = "all" | "with" | "without";
 
@@ -24,7 +25,8 @@ export default function ListeClient() {
   
   const { clients, setSelectedClientId, loading, loadClients } = useOutletContext<ClientsContext>();
   const [error, setError] = useState("");
-
+  const [exporting, setExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState<{ done: number; total: number } | null>(null);
 
   // filters data state
   const [agenceOptions, setAgenceOptions] = useState<agencetItem[]>([]);
@@ -136,6 +138,21 @@ export default function ListeClient() {
     navigate(`../maps?${searchParams.toString()}`);
   };
 
+  const handleExportExcel = async () => {
+    setExporting(true);
+    setExportProgress({ done: 0, total: filteredClients.length });
+    try {
+      await exportClientsToExcel(filteredClients, (done, total) =>
+        setExportProgress({ done, total })
+      );
+    } catch (err) {
+      console.error("Erreur lors de l'extraction Excel :", err);
+    } finally {
+      setExporting(false);
+      setExportProgress(null);
+    }
+  };
+
   // display handling with error
   if (loading)
     return (
@@ -182,6 +199,18 @@ export default function ListeClient() {
           className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-blue-200 px-3 py-1.5 text-xs font-medium hover:bg-blue-300"
         >
           Voir sur la carte
+        </button>
+
+        <button
+          type="button"
+          onClick={handleExportExcel}
+          disabled={exporting}
+          className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-green-200 px-3 py-1.5 text-xs font-medium hover:bg-green-300 disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          <File className="h-3.5 w-3.5" />
+          {exporting
+            ? `Extraction en cours... (${exportProgress?.done ?? 0}/${exportProgress?.total ?? 0})`
+            : "Extraction Excel"}
         </button>
 
       </div>

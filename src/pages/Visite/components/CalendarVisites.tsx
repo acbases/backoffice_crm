@@ -245,7 +245,7 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                                 className="
                                     space-y-1.5
                                     max-h-[260px]
-                                    
+
                                     pr-1
 
                                     scrollbar-thin

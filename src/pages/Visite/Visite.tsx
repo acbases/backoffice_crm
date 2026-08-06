@@ -14,7 +14,7 @@ export default function Visite() {
   const [visites, setVisites] = useState<VisiteItem[]>([]);
   const [selectedVisiteId, setSelectedVisiteId] = useState("");
   return (
-    <div id="Visites-page" className="flex flex-col min-h-screen space-y-0">
+    <div id="Visites-page" className="flex flex-col h-screen overflow-hidden space-y-0">
       {/* page title */}
 
       {/* tabs */}

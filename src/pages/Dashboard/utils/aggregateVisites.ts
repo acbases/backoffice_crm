@@ -35,17 +35,15 @@ export function bucketLabel(key: string, granularity: Granularity): string {
 
 export function buildTimeline(granularity: Granularity, referenceDate: Date = new Date()): string[] {
   if (granularity === "day") {
-    return Array.from({ length: 30 }, (_, i) => {
-      const d = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate() - (29 - i));
-      return dayKeyFromDate(d);
-    });
+    const year = referenceDate.getFullYear();
+    const month = referenceDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    return Array.from({ length: daysInMonth }, (_, i) => dayKeyFromDate(new Date(year, month, i + 1)));
   }
 
   if (granularity === "month") {
-    return Array.from({ length: 12 }, (_, i) => {
-      const d = new Date(referenceDate.getFullYear(), referenceDate.getMonth() - (11 - i), 1);
-      return monthKeyFromDate(d);
-    });
+    const year = referenceDate.getFullYear();
+    return Array.from({ length: 12 }, (_, i) => monthKeyFromDate(new Date(year, i, 1)));
   }
 
   const currentYear = referenceDate.getFullYear();

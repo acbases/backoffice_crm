@@ -11,10 +11,17 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const currentMonthValue = useMemo(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  }, []);
+
   const [granulariteEffectuees, setGranulariteEffectuees] = useState<Granularity>("day");
   const [granulariteEmploye, setGranulariteEmploye] = useState<Granularity>("day");
   const [employeId, setEmployeId] = useState("");
   const [anneeCompletion, setAnneeCompletion] = useState("");
+  const [moisEffectuees, setMoisEffectuees] = useState(currentMonthValue);
+  const [moisEmploye, setMoisEmploye] = useState(currentMonthValue);
 
   useEffect(() => {
     const load = async () => {
@@ -61,7 +68,14 @@ export default function Dashboard() {
     [visitesCompletion]
   );
 
-  const timelineEffectuees = useMemo(() => buildTimeline(granulariteEffectuees), [granulariteEffectuees]);
+  const refDateEffectuees = useMemo(() => {
+    const [y, m] = moisEffectuees.split("-").map(Number);
+    return new Date(y, m - 1, 1);
+  }, [moisEffectuees]);
+  const timelineEffectuees = useMemo(
+    () => buildTimeline(granulariteEffectuees, granulariteEffectuees === "day" ? refDateEffectuees : undefined),
+    [granulariteEffectuees, refDateEffectuees]
+  );
   const dataEffectuees = useMemo(
     () => countVisitesByBucket(visitesEffectuees, granulariteEffectuees, timelineEffectuees),
     [visitesEffectuees, granulariteEffectuees, timelineEffectuees]
@@ -71,7 +85,14 @@ export default function Dashboard() {
     () => (employeId ? visites.filter((v) => String(v.utilisateur?.id) === employeId) : visites),
     [visites, employeId]
   );
-  const timelineEmploye = useMemo(() => buildTimeline(granulariteEmploye), [granulariteEmploye]);
+  const refDateEmploye = useMemo(() => {
+    const [y, m] = moisEmploye.split("-").map(Number);
+    return new Date(y, m - 1, 1);
+  }, [moisEmploye]);
+  const timelineEmploye = useMemo(
+    () => buildTimeline(granulariteEmploye, granulariteEmploye === "day" ? refDateEmploye : undefined),
+    [granulariteEmploye, refDateEmploye]
+  );
   const dataEmploye = useMemo(
     () => countVisitesByBucket(visitesEmploye, granulariteEmploye, timelineEmploye),
     [visitesEmploye, granulariteEmploye, timelineEmploye]
@@ -96,6 +117,11 @@ export default function Dashboard() {
       visitesEmployeFenetre.filter((v) => v.statut !== 1 && v.date && new Date(v.date) < new Date()).length,
     [visitesEmployeFenetre]
   );
+  const enRetardEmployePercent =
+    visitesEmployeFenetre.length > 0 ? (enRetardEmploye / visitesEmployeFenetre.length) * 100 : 0;
+  const aVenirEmploye = Math.max(nonEffectueesEmploye - enRetardEmploye, 0);
+  const aVenirEmployePercent =
+    visitesEmployeFenetre.length > 0 ? (aVenirEmploye / visitesEmployeFenetre.length) * 100 : 0;
 
   if (loading) {
     return (
@@ -144,6 +170,16 @@ export default function Dashboard() {
         granularity={granulariteEffectuees}
         onGranularityChange={setGranulariteEffectuees}
         color="#2a78d6"
+        extraControls={
+          granulariteEffectuees === "day" ? (
+            <input
+              type="month"
+              value={moisEffectuees}
+              onChange={(event) => setMoisEffectuees(event.target.value)}
+              className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 outline-none focus:border-red-500"
+            />
+          ) : null
+        }
       />
 
       <TimeSeriesCard
@@ -154,34 +190,55 @@ export default function Dashboard() {
         onGranularityChange={setGranulariteEmploye}
         color="#eb6834"
         extraControls={
-          <select
-            value={employeId}
-            onChange={(event) => setEmployeId(event.target.value)}
-            className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 outline-none focus:border-red-500"
-          >
-            <option value="">Tous les employés</option>
-            {utilisateurs.map((u) => (
-              <option key={u.id} value={String(u.id)}>
-                {u.firstname} {u.name}
-              </option>
-            ))}
-          </select>
+          <>
+            {granulariteEmploye === "day" && (
+              <input
+                type="month"
+                value={moisEmploye}
+                onChange={(event) => setMoisEmploye(event.target.value)}
+                className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 outline-none focus:border-red-500"
+              />
+            )}
+            <select
+              value={employeId}
+              onChange={(event) => setEmployeId(event.target.value)}
+              className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 outline-none focus:border-red-500"
+            >
+              <option value="">Tous les employés</option>
+              {utilisateurs.map((u) => (
+                <option key={u.id} value={String(u.id)}>
+                  {u.firstname} {u.name}
+                </option>
+              ))}
+            </select>
+          </>
         }
         extraStats={
-          <div className="flex flex-wrap gap-6">
-            <div className="flex items-center gap-2 text-sm">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#9ca3af" }} />
-              <span className="text-gray-600">Planifiées non effectuées</span>
-              <span className="font-semibold text-gray-900">
-                {nonEffectueesEmploye.toLocaleString("fr-FR")} ({nonEffectueesEmployePercent.toFixed(0)}%)
-              </span>
+          <div>
+            <div className="flex flex-wrap gap-6">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#4a3aa7" }} />
+                <span className="text-gray-600">Non effectuées</span>
+                <span className="font-semibold text-gray-900">
+                  {nonEffectueesEmploye.toLocaleString("fr-FR")} ({nonEffectueesEmployePercent.toFixed(0)}%)
+                </span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#d03b3b" }} />
-              <span className="text-gray-600">En retard</span>
-              <span className="font-semibold text-gray-900">
-                {enRetardEmploye.toLocaleString("fr-FR")}
-              </span>
+            <div className="mt-2 flex flex-wrap gap-6 pl-1 text-xs text-gray-500">
+              <div className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#d03b3b" }} />
+                dont en retard :{" "}
+                <span className="font-medium text-gray-700">
+                  {enRetardEmploye.toLocaleString("fr-FR")} ({enRetardEmployePercent.toFixed(0)}%)
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#9ca3af" }} />
+                dont à venir :{" "}
+                <span className="font-medium text-gray-700">
+                  {aVenirEmploye.toLocaleString("fr-FR")} ({aVenirEmployePercent.toFixed(0)}%)
+                </span>
+              </div>
             </div>
           </div>
         }

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 
 type CompletionRateCardProps = {
   done: number;
@@ -8,13 +8,23 @@ type CompletionRateCardProps = {
 };
 
 const DONE_COLOR = "#0ca30c";
-const NOT_DONE_COLOR = "#9ca3af";
+const NOT_DONE_COLOR = "#4a3aa7";
+const UPCOMING_COLOR = "#9ca3af";
 const LATE_COLOR = "#d03b3b";
 
 export default function CompletionRateCard({ done, total, enRetard, extraControls }: CompletionRateCardProps) {
   const notDone = Math.max(total - done, 0);
+  const aVenir = Math.max(notDone - enRetard, 0);
   const donePercent = total > 0 ? (done / total) * 100 : 0;
   const notDonePercent = total > 0 ? (notDone / total) * 100 : 0;
+  const enRetardPercent = total > 0 ? (enRetard / total) * 100 : 0;
+  const aVenirPercent = total > 0 ? (aVenir / total) * 100 : 0;
+
+  const segments = [
+    { value: donePercent, color: DONE_COLOR },
+    { value: enRetardPercent, color: LATE_COLOR },
+    { value: aVenirPercent, color: UPCOMING_COLOR },
+  ].filter((segment) => segment.value > 0);
 
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -37,15 +47,14 @@ export default function CompletionRateCard({ done, total, enRetard, extraControl
       <div
         className="flex h-8 w-full overflow-hidden rounded-full bg-gray-100"
         role="img"
-        aria-label={`${donePercent.toFixed(0)}% des visites effectuées, ${notDonePercent.toFixed(0)}% non effectuées`}
+        aria-label={`${donePercent.toFixed(0)}% effectuées, ${enRetardPercent.toFixed(0)}% en retard, ${aVenirPercent.toFixed(0)}% à venir`}
       >
-        {donePercent > 0 && (
-          <div style={{ width: `${donePercent}%`, backgroundColor: DONE_COLOR }} />
-        )}
-        {donePercent > 0 && notDonePercent > 0 && <div className="w-[2px] shrink-0 bg-white" />}
-        {notDonePercent > 0 && (
-          <div style={{ width: `${notDonePercent}%`, backgroundColor: NOT_DONE_COLOR }} />
-        )}
+        {segments.map((segment, index) => (
+          <Fragment key={segment.color}>
+            {index > 0 && <div className="w-[2px] shrink-0 bg-white" />}
+            <div style={{ width: `${segment.value}%`, backgroundColor: segment.color }} />
+          </Fragment>
+        ))}
       </div>
 
       <div className="mt-4 flex flex-wrap gap-6 text-sm">
@@ -63,11 +72,21 @@ export default function CompletionRateCard({ done, total, enRetard, extraControl
             {notDone.toLocaleString("fr-FR")} ({notDonePercent.toFixed(0)}%)
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: LATE_COLOR }} />
-          <span className="text-gray-600">En retard</span>
-          <span className="font-semibold text-gray-900">
-            {enRetard.toLocaleString("fr-FR")}
+      </div>
+
+      <div className="mt-2 flex flex-wrap gap-6 pl-1 text-xs text-gray-500">
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: LATE_COLOR }} />
+          dont en retard :{" "}
+          <span className="font-medium text-gray-700">
+            {enRetard.toLocaleString("fr-FR")} ({enRetardPercent.toFixed(0)}%)
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: UPCOMING_COLOR }} />
+          dont à venir :{" "}
+          <span className="font-medium text-gray-700">
+            {aVenir.toLocaleString("fr-FR")} ({aVenirPercent.toFixed(0)}%)
           </span>
         </div>
       </div>

@@ -35,7 +35,7 @@ function roundedTopBarPath(x: number, yTop: number, width: number, barHeight: nu
     Z`;
 }
 
-export default function BarChart({ data, color = "#2a78d6", height = 220 }: BarChartProps) {
+export default function BarChart({ data, color = "#2a78d6", height = 280 }: BarChartProps) {
   const [hovered, setHovered] = useState<{ index: number; x: number; y: number } | null>(null);
 
   const width = Math.max(480, data.length * 26);
@@ -48,11 +48,13 @@ export default function BarChart({ data, color = "#2a78d6", height = 220 }: BarC
   const midValue = Math.round(maxValue / 2);
 
   const slotWidth = width / Math.max(data.length, 1);
-  const barWidth = Math.max(4, Math.min(24, slotWidth * 0.6));
+  const barWidth = Math.max(3, Math.min(12, slotWidth * 0.35));
   const labelEvery = Math.max(1, Math.ceil(data.length / 8));
+  const lastIndex = data.length - 1;
 
   return (
     <div className="relative">
+      <p className="mb-1 text-xs font-medium text-gray-500">Nombre de visites</p>
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className="w-full"
@@ -80,7 +82,8 @@ export default function BarChart({ data, color = "#2a78d6", height = 220 }: BarC
           const x = i * slotWidth + (slotWidth - barWidth) / 2;
           const yTop = baselineY - barHeight;
           const isHovered = hovered?.index === i;
-          const showLabel = i % labelEvery === 0 || i === data.length - 1;
+          const showLabel =
+            i === lastIndex || (i % labelEvery === 0 && lastIndex - i >= labelEvery);
 
           return (
             <g key={d.key}>
@@ -117,6 +120,30 @@ export default function BarChart({ data, color = "#2a78d6", height = 220 }: BarC
             </g>
           );
         })}
+
+        {(() => {
+          const points = data.map((d, i) => ({
+            x: i * slotWidth + slotWidth / 2,
+            y: baselineY - (maxValue > 0 ? (d.value / maxValue) * chartHeight : 0),
+          }));
+          const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"}${p.x},${p.y}`).join(" ");
+
+          return (
+            <g pointerEvents="none">
+              <path
+                d={linePath}
+                fill="none"
+                stroke={color}
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {points.map((p, i) => (
+                <circle key={data[i].key} cx={p.x} cy={p.y} r={4} fill={color} stroke="#fcfcfb" strokeWidth={2} />
+              ))}
+            </g>
+          );
+        })()}
       </svg>
 
       {hovered && (
