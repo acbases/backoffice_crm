@@ -258,6 +258,14 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                                     <div
                                         key={visite.id}
 
+                                        onClick={() => {
+                                            setHoveredVisite(null);
+                                            setSelectedDayVisites({
+                                                date: dayKey,
+                                                visites: [visite],
+                                            });
+                                        }}
+
                                         onMouseEnter={(e) =>
                                             setHoveredVisite({
                                                 visite,
@@ -434,11 +442,11 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                         >
                             <div>
                                 <h3 className="font-bold text-lg">
-                                    📅 Visites du {selectedDayVisites.date}
+                                    📅 {selectedDayVisites.visites.length > 1 ? "Visites du" : "Visite du"} {selectedDayVisites.date}
                                 </h3>
 
                                 <p className="text-sm">
-                                    {selectedDayVisites.visites.length} visites
+                                    {selectedDayVisites.visites.length} visite{selectedDayVisites.visites.length > 1 ? "s" : ""}
                                 </p>
                             </div>
 
