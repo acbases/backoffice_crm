@@ -56,6 +56,10 @@ export default function Dashboard() {
     () => visitesCompletion.filter((v) => v.statut === 1),
     [visitesCompletion]
   );
+  const enRetardCompletion = useMemo(
+    () => visitesCompletion.filter((v) => v.statut !== 1 && v.date && new Date(v.date) < new Date()).length,
+    [visitesCompletion]
+  );
 
   const timelineEffectuees = useMemo(() => buildTimeline(granulariteEffectuees), [granulariteEffectuees]);
   const dataEffectuees = useMemo(
@@ -87,6 +91,12 @@ export default function Dashboard() {
   const nonEffectueesEmployePercent =
     visitesEmployeFenetre.length > 0 ? (nonEffectueesEmploye / visitesEmployeFenetre.length) * 100 : 0;
 
+  const enRetardEmploye = useMemo(
+    () =>
+      visitesEmployeFenetre.filter((v) => v.statut !== 1 && v.date && new Date(v.date) < new Date()).length,
+    [visitesEmployeFenetre]
+  );
+
   if (loading) {
     return (
       <div className="m-4 rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-500">
@@ -110,6 +120,7 @@ export default function Dashboard() {
       <CompletionRateCard
         done={visitesEffectueesCompletion.length}
         total={visitesCompletion.length}
+        enRetard={enRetardCompletion}
         extraControls={
           <select
             value={anneeCompletion}
@@ -157,12 +168,21 @@ export default function Dashboard() {
           </select>
         }
         extraStats={
-          <div className="flex items-center gap-2 text-sm">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#9ca3af" }} />
-            <span className="text-gray-600">Planifiées non effectuées</span>
-            <span className="font-semibold text-gray-900">
-              {nonEffectueesEmploye.toLocaleString("fr-FR")} ({nonEffectueesEmployePercent.toFixed(0)}%)
-            </span>
+          <div className="flex flex-wrap gap-6">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#9ca3af" }} />
+              <span className="text-gray-600">Planifiées non effectuées</span>
+              <span className="font-semibold text-gray-900">
+                {nonEffectueesEmploye.toLocaleString("fr-FR")} ({nonEffectueesEmployePercent.toFixed(0)}%)
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#d03b3b" }} />
+              <span className="text-gray-600">En retard</span>
+              <span className="font-semibold text-gray-900">
+                {enRetardEmploye.toLocaleString("fr-FR")}
+              </span>
+            </div>
           </div>
         }
       />

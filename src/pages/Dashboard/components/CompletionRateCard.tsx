@@ -3,13 +3,15 @@ import type { ReactNode } from "react";
 type CompletionRateCardProps = {
   done: number;
   total: number;
+  enRetard: number;
   extraControls?: ReactNode;
 };
 
 const DONE_COLOR = "#0ca30c";
 const NOT_DONE_COLOR = "#9ca3af";
+const LATE_COLOR = "#d03b3b";
 
-export default function CompletionRateCard({ done, total, extraControls }: CompletionRateCardProps) {
+export default function CompletionRateCard({ done, total, enRetard, extraControls }: CompletionRateCardProps) {
   const notDone = Math.max(total - done, 0);
   const donePercent = total > 0 ? (done / total) * 100 : 0;
   const notDonePercent = total > 0 ? (notDone / total) * 100 : 0;
@@ -59,6 +61,13 @@ export default function CompletionRateCard({ done, total, extraControls }: Compl
           <span className="text-gray-600">Non effectuées</span>
           <span className="font-semibold text-gray-900">
             {notDone.toLocaleString("fr-FR")} ({notDonePercent.toFixed(0)}%)
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: LATE_COLOR }} />
+          <span className="text-gray-600">En retard</span>
+          <span className="font-semibold text-gray-900">
+            {enRetard.toLocaleString("fr-FR")}
           </span>
         </div>
       </div>

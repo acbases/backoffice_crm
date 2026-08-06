@@ -28,8 +28,24 @@ export async function getUsers() {
   );
 }
 
-export  async function createUser() {
+export async function importUserFromAllpro() {
   const { data } = await api.post<UserItem>("/user");
+  return data;
+}
+
+export type CreateUserPayload = {
+  name: string;
+  firstname: string;
+  matricule: string;
+  email: string;
+  password: string;
+  role_crm: string;
+  poste: string;
+  statut: boolean;
+};
+
+export async function createUser(payload: CreateUserPayload) {
+  const { data } = await api.post<UserItem>("/user", payload);
   return data;
 }
 
