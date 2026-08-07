@@ -150,22 +150,22 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
     }
   
     return (
-        <div className="m-4 max-w-5xl rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 p-6 shadow-lg">
-            <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 capitalize">
+        <div className="m-2 max-w-5xl rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-gray-50 p-3 shadow-lg">
+            <div className="mb-2 flex items-center justify-between">
+                <h2 className="text-base font-semibold text-gray-900 capitalize">
                     {monthLabel}
                 </h2>
                 <div className="flex gap-2">
                     <button type="button" onClick={goToPreviousMonth}
-                        className="rounded-lg border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50">
+                        className="rounded-lg border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50">
                         ←
                     </button>
                     <button type="button" onClick={goToToday}
-                        className="rounded-lg border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50">
+                        className="rounded-lg border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50">
                         Aujourd'hui
                     </button>
                     <button type="button" onClick={goToNextMonth}
-                        className="rounded-lg border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50">
+                        className="rounded-lg border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50">
                         →
                     </button>
                 </div>
@@ -183,8 +183,9 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                         from-blue-600
                         to-blue-500
                         px-2
-                        py-3
+                        py-1.5
                         text-center
+                        text-[11px]
                         font-semibold
                         text-white"
                     >
@@ -194,7 +195,7 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
 
                 {cells.map((cell) => {
                     if (!cell.date) {
-                        return <div key={cell.key} className="min-h-[90px] bg-white" />;
+                        return <div key={cell.key} className="min-h-[105px] bg-white" />;
                     }
                     const dayKey = toDateKey(cell.date);
                     const dayVisites = visitesByDay.get(dayKey) ?? [];
@@ -206,8 +207,8 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                             className={`
                                 relative
                                 overflow-visible
-                                min-h-[140px]
-                                p-2
+                                min-h-[105px]
+                                p-1.5
                                 transition-all
                                 duration-200
 
@@ -231,8 +232,8 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                             <div className="
                                 flex
                                 justify-end
-                                mb-2
-                                text-xs
+                                mb-1
+                                text-[10px]
                                 font-semibold
                                 text-gray-400
                             ">
@@ -241,20 +242,9 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
 
 
                             {/* Liste des visites */}
-                            <div
-                                className="
-                                    space-y-1.5
-                                    max-h-[260px]
+                            <div className="space-y-1 pr-1">
 
-                                    pr-1
-
-                                    scrollbar-thin
-                                    scrollbar-thumb-gray-300
-                                    scrollbar-track-gray-100
-                                "
-                            >
-
-                                {dayVisites.slice(0, 3).map((visite) => (
+                                {dayVisites.slice(0, 2).map((visite) => (
                                     <div
                                         key={visite.id}
 
@@ -291,13 +281,13 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                                             group
                                             cursor-pointer
 
-                                            rounded-xl
+                                            rounded-lg
                                             border
 
-                                            px-3
-                                            py-2
+                                            px-2
+                                            py-1
 
-                                            text-[11px]
+                                            text-[10px]
                                             font-semibold
 
                                             shadow-sm
@@ -333,7 +323,7 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                                     </div>
                                 ))}
 
-                                {dayVisites.length > 3 && (
+                                {dayVisites.length > 2 && (
                                     <button
                                         onClick={() =>
                                             setSelectedDayVisites({
@@ -342,7 +332,7 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                                             })
                                         }
                                         className="
-                                            mt-2
+                                            mt-1
                                             w-full
 
                                             rounded-lg
@@ -350,10 +340,10 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                                             bg-gray-200
                                             hover:bg-gray-300
 
-                                            px-2
-                                            py-1
+                                            px-1.5
+                                            py-0.5
 
-                                            text-[11px]
+                                            text-[10px]
                                             font-bold
                                             text-gray-700
 
@@ -366,7 +356,7 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                                             hover:shadow-lg
                                         "
                                     >
-                                        +{dayVisites.length - 3} visites
+                                        +{dayVisites.length - 2} visites
                                     </button>
                                 )}
 
@@ -376,7 +366,7 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
                                         text-center
                                         text-[10px]
                                         text-gray-300
-                                        mt-5
+                                        mt-1
                                     ">
                                         Aucune visite
                                     </div>
@@ -546,7 +536,7 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
 
                         <div>
                             <span className="font-semibold">Date :</span><br />
-                            {hoveredVisite.visite.date}
+                            {new Date(hoveredVisite.visite.date).toLocaleDateString("fr-FR")}
                         </div>
 
                         <div>

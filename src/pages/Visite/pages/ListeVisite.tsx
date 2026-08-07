@@ -30,6 +30,7 @@ function ListeVisite() {
     const [error, setError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [exporting, setExporting] = useState(false);
 
     const { user, isAdmin } = useCurrentUser();
 
@@ -346,13 +347,22 @@ function ListeVisite() {
                     Liste de tous les visites
                 </h2>
                 <button
-                    onClick={() => exportVisitesToExcel(visites)}
-                    className="flex gap-1 items-center justify-center text-sm px-2 transition-colors duration-100 bg-blue-200 rounded-lg hover:bg-blue-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer"
+                    type="button"
+                    onClick={async () => {
+                        setExporting(true);
+                        try {
+                            await exportVisitesToExcel(visites);
+                        } catch (err) {
+                            console.error("Erreur lors de l'extraction Excel :", err);
+                        } finally {
+                            setExporting(false);
+                        }
+                    }}
+                    disabled={exporting}
+                    className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-green-200 px-3 py-1.5 text-xs font-medium hover:bg-green-300 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                    <File
-                        className="w-[15px] h-[15px] text-gray-500 "
-                    />
-                    Extraction
+                    <File className="h-3.5 w-3.5" />
+                    {exporting ? "Extraction en cours..." : "Extraction Excel"}
                 </button>
             </div>
 
@@ -387,12 +397,25 @@ function ListeVisite() {
             {/* ── Desktop table ── */}
             <div className="hidden md:flex-1 md:block md:min-h-0 md:overflow-y-auto">
                 <table className="w-full text-sm ml-4 mt-2" style={{ tableLayout: "fixed" }}>
+                    <colgroup>
+                        <col className="w-[3%]" />
+                        <col className="w-[5%]" />
+                        <col className="w-[12%]" />
+                        <col className="w-[13%]" />
+                        <col className="w-[8%]" />
+                        <col className="w-[10%]" />
+                        <col className="w-[11%]" />
+                        <col className="w-[9%]" />
+                        <col className="w-[11%]" />
+                        <col className="w-[9%]" />
+                        <col className="w-[9%]" />
+                    </colgroup>
                     <thead className="py-4">
                         <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500 ">
                             <th className="px-1 py-3"></th>
                             <th><SortableHeader label="Id" sortKey="id" /></th>
                             <th><SortableHeader label="Client" sortKey="client" /></th>
-                            <th><SortableHeader label="Utilisateur" sortKey="utilisateur" /></th>
+                            <th><SortableHeader label="Commercial" sortKey="utilisateur" /></th>
                             <th><SortableHeader label="Planifiée" sortKey="planifiee" /></th>
                             <th><SortableHeader label="Type" sortKey="type" /></th>
                             <th><SortableHeader label="Catégorie" sortKey="categorie" /></th>
@@ -418,10 +441,17 @@ function ListeVisite() {
                                 <td className="px-1 py-3 font-medium text-gray-900">
                                     {visite.id ?? "-"}
                                 </td>
-                                <td className="px-1 py-3 font-medium text-gray-900">
+                                <td className="truncate px-1 py-3 font-medium text-gray-900" title={visite.client?.nom ?? ""}>
                                     {visite.client?.nom ?? "Client inconnu"}
                                 </td>
-                                <td className="px-1 py-3 font-medium text-gray-900">
+                                <td
+                                    className="truncate px-1 py-3 font-medium text-gray-900"
+                                    title={
+                                        visite.utilisateur
+                                            ? `${visite.utilisateur.firstname ?? ""} ${visite.utilisateur.name ?? ""}`.trim()
+                                            : ""
+                                    }
+                                >
                                     {visite.utilisateur
                                         ? `${visite.utilisateur.firstname ?? ""} ${visite.utilisateur.name ?? ""}`.trim() || "User inconnu"
                                         : "User inconnu"}
@@ -434,19 +464,19 @@ function ListeVisite() {
                                 </td>
 
 
-                                <td className="px-1 py-3 text-gray-500">
+                                <td className="truncate px-1 py-3 text-gray-500" title={visite.type_visite?.nom ?? ""}>
                                     {visite.type_visite?.nom ?? "—"}
                                 </td>
-                                <td className="px-1 py-3 text-gray-500">
+                                <td className="truncate px-1 py-3 text-gray-500" title={visite.categorie_visite?.intitule ?? ""}>
                                     {visite.categorie_visite?.intitule ?? "—"}
                                 </td>
-                                <td className="px-1 py-3 text-gray-500">
+                                <td className="truncate px-1 py-3 text-gray-500" title={visite.client?.zone ?? ""}>
                                     {visite.client?.zone ?? "—"}
                                 </td>
-                                <td className="px-1 py-3 text-gray-500">
+                                <td className="truncate px-1 py-3 text-gray-500" title={visite.client?.quartier ?? ""}>
                                     {visite.client?.quartier ?? "—"}
                                 </td>
-                                <td className="px-1 py-3 text-gray-500">
+                                <td className="truncate px-1 py-3 text-gray-500">
                                     {visite.date ? formatDate(visite.date) : "—"}
                                 </td>
                                 {/* <td className="px-1 py-3 text-gray-500">

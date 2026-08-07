@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import { File } from "lucide-react";
 import type { UtilisateursContext } from "../Utilisateur";
+import { exportUtilisateursToExcel } from "../utils/exportUtilisateursToExcel";
 
 const normalizeText = (value: string | null | undefined) =>
   (value ?? "").trim().toLowerCase();
@@ -8,6 +10,18 @@ const normalizeText = (value: string | null | undefined) =>
 export default function Liste() {
   const { utilisateurs, loading } = useOutletContext<UtilisateursContext>();
   const [nomFilter, setNomFilter] = useState("");
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportExcel = async () => {
+    setExporting(true);
+    try {
+      await exportUtilisateursToExcel(filteredUtilisateurs);
+    } catch (err) {
+      console.error("Erreur lors de l'extraction Excel :", err);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const filteredUtilisateurs = useMemo(() => {
     if (!nomFilter) return utilisateurs;
@@ -37,13 +51,24 @@ export default function Liste() {
     <div className="m-4 flex flex-col h-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
       <div className="flex flex-col gap-3 border-b border-gray-200 p-5 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-semibold text-gray-900">Liste des utilisateurs</h2>
-        <input
-          value={nomFilter}
-          onChange={(event) => setNomFilter(event.target.value)}
-          placeholder="Rechercher un utilisateur..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-red-500 sm:w-64"
-          type="text"
-        />
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <input
+            value={nomFilter}
+            onChange={(event) => setNomFilter(event.target.value)}
+            placeholder="Rechercher un utilisateur..."
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-red-500 sm:w-64"
+            type="text"
+          />
+          <button
+            type="button"
+            onClick={handleExportExcel}
+            disabled={exporting}
+            className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-green-200 px-3 py-1.5 text-xs font-medium hover:bg-green-300 disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            <File className="h-3.5 w-3.5" />
+            {exporting ? "Extraction en cours..." : "Extraction Excel"}
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto">

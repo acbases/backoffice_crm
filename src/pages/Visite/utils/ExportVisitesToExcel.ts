@@ -1,5 +1,3 @@
-import * as XLSX from "xlsx";
-
 type VisiteItem = {
     id: number;
     date: string;
@@ -34,7 +32,27 @@ type VisiteItem = {
     };
 };
 
-export const exportVisitesToExcel = (visites: VisiteItem[]) => {
+const HEADERS = [
+    "ID",
+    "Client",
+    "Utilisateur",
+    "Matricule",
+    "Planifiée",
+    "Type visite",
+    "Catégorie visite",
+    "Zone",
+    "Quartier",
+    "Catégorie client",
+    "Date",
+    "Statut",
+    "Objet",
+];
+
+const HEADER_FILL = "FF2E7D32"; // vert
+const MIN_COLUMN_WIDTH = 10;
+const MAX_COLUMN_WIDTH = 40;
+
+export const exportVisitesToExcel = async (visites: VisiteItem[]) => {
     const rows = visites.map((visite) => {
         const isPast = visite.date
             ? new Date(visite.date) < new Date()
@@ -48,53 +66,66 @@ export const exportVisitesToExcel = (visites: VisiteItem[]) => {
             statut = "En retard";
         }
 
-        return {
-            ID: visite.id,
-
-            Client: visite.client?.nom ?? "",
-
-            Utilisateur: visite.utilisateur
+        return [
+            visite.id,
+            visite.client?.nom ?? "",
+            visite.utilisateur
                 ? `${visite.utilisateur.firstname ?? ""} ${visite.utilisateur.name ?? ""}`.trim()
                 : "",
-
-            Matricule: visite.utilisateur?.matricule ?? "",
-
-            Planifiée: visite.type === 0 ? "Oui" : "Non",
-
-            "Type visite": visite.type_visite?.nom ?? "",
-
-            "Catégorie visite":
-                visite.categorie_visite?.intitule ?? "",
-
-            Zone: visite.client?.zone ?? "",
-
-            Quartier: visite.client?.quartier ?? "",
-
-            "Catégorie client":
-                visite.client?.categorie_client?.intitule ?? "",
-
-            Date: visite.date,
-
-            Statut: statut,
-
-            Objet: visite.object ?? "",
-        };
+            visite.utilisateur?.matricule ?? "",
+            visite.type === 0 ? "Oui" : "Non",
+            visite.type_visite?.nom ?? "",
+            visite.categorie_visite?.intitule ?? "",
+            visite.client?.zone ?? "",
+            visite.client?.quartier ?? "",
+            visite.client?.categorie_client?.intitule ?? "",
+            visite.date,
+            statut,
+            visite.object ?? "",
+        ];
     });
 
-    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const { default: ExcelJS } = await import("exceljs");
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Visites");
 
-    const workbook = XLSX.utils.book_new();
+    worksheet.addRow(HEADERS);
+    rows.forEach((row) => worksheet.addRow(row));
 
-    XLSX.utils.book_append_sheet(
-        workbook,
-        worksheet,
-        "Visites"
-    );
+    const headerRow = worksheet.getRow(1);
+    headerRow.eachCell((cell) => {
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: HEADER_FILL },
+        };
+        cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+        cell.alignment = { vertical: "middle", horizontal: "left" };
+    });
+
+    // ajuste la largeur de chaque colonne selon le contenu le plus long
+    HEADERS.forEach((header, index) => {
+        let maxLength = header.length;
+        rows.forEach((row) => {
+            const value = row[index];
+            if (value) maxLength = Math.max(maxLength, String(value).length);
+        });
+
+        worksheet.getColumn(index + 1).width = Math.min(
+            Math.max(maxLength + 2, MIN_COLUMN_WIDTH),
+            MAX_COLUMN_WIDTH
+        );
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
 
     const today = new Date().toISOString().split("T")[0];
-
-    XLSX.writeFile(
-        workbook,
-        `visites_${today}.xlsx`
-    );
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `visites_${today}.xlsx`;
+    link.click();
+    URL.revokeObjectURL(link.href);
 };

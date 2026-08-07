@@ -10,7 +10,7 @@ export default function VisitesPage() {
             <div className="min-h-0 overflow-y-auto">
                 <AjoutVisite onCreated={() => setRefreshKey((k) => k + 1)} />
             </div>
-            <div className="min-h-0 overflow-y-auto">
+            <div className="min-h-0">
                 <CalendarVisites refreshKey={refreshKey} />
             </div>
         </div>

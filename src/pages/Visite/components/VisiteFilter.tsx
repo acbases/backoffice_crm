@@ -117,7 +117,7 @@ function VisiteFilters({
             </label>
 
             <label className="flex flex-col gap-1.5 text-sm text-gray-600" htmlFor="user-filter">
-                <span className="font-medium text-gray-700">Utilisateur</span>
+                <span className="font-medium text-gray-700">Commercial</span>
                 <input
                     id="user-filter"
                     list="users-list"
