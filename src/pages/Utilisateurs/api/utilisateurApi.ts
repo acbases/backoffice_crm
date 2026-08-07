@@ -28,8 +28,8 @@ export async function getUsers() {
   );
 }
 
-export async function importUserFromAllpro() {
-  const { data } = await api.post<UserItem>("/user");
+export async function importUsersFromAllproRh() {
+  const { data } = await api.post<UserItem[]>("/users/import-allpro-rh");
   return data;
 }
 
