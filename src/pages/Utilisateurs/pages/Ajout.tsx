@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { createUser, importUserFromAllpro } from "../api/utilisateurApi";
+import { createUser, importUsersFromAllproRh } from "../api/utilisateurApi";
 import type { UtilisateursContext } from "../Utilisateur";
 
 const ROLES = ["admin", "utilisateur"];
@@ -36,11 +36,11 @@ export default function Ajout() {
     setImportError("");
 
     try {
-      await importUserFromAllpro();
+      await importUsersFromAllproRh();
       await loadUtilisateurs();
       navigate("../liste");
     } catch {
-      setImportError("Impossible d'importer l'utilisateur depuis Allpro.");
+      setImportError("Impossible d'importer les utilisateurs depuis Allpro RH.");
     } finally {
       setImporting(false);
     }
@@ -66,9 +66,9 @@ export default function Ajout() {
   return (
     <div className="m-4 max-w-xl space-y-6">
       <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">Importer depuis Allpro</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Importer depuis Allpro RH</h2>
         <p className="text-sm text-gray-500">
-          L'utilisateur sera importé depuis Allpro et ajouté à la liste des utilisateurs du CRM.
+          Les utilisateurs seront importés depuis Allpro RH et ajoutés à la liste des utilisateurs du CRM.
         </p>
 
         {importError ? (
@@ -81,7 +81,7 @@ export default function Ajout() {
           disabled={importing}
           className="rounded-lg bg-blue-200 px-4 py-2 text-sm font-medium hover:bg-blue-300 disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {importing ? "En cours..." : "Importer depuis Allpro"}
+          {importing ? "En cours..." : "Importer depuis Allpro RH"}
         </button>
       </div>
 
