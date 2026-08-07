@@ -1,4 +1,5 @@
 import type { VisiteItem } from "@/pages/Visite/api/visiteApi";
+import type { StatusKey } from "./visiteStatus";
 
 export type Granularity = "day" | "month" | "year";
 
@@ -7,6 +8,11 @@ export type BucketCount = {
   label: string;
   value: number;
 };
+
+export type StatusBucketCount = {
+  key: string;
+  label: string;
+} & Record<StatusKey, number>;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -68,4 +74,34 @@ export function countVisitesByBucket(
     label: bucketLabel(key, granularity),
     value: counts.get(key) ?? 0,
   }));
+}
+
+export function countVisitesByBucketAndStatus(
+  visites: VisiteItem[],
+  granularity: Granularity,
+  timeline: string[]
+): StatusBucketCount[] {
+  const counts = new Map<string, Record<StatusKey, number>>();
+  const now = new Date();
+
+  visites.forEach((visite) => {
+    if (!visite.date) return;
+    const key = bucketKey(visite.date, granularity);
+    const entry = counts.get(key) ?? { effectuee: 0, enRetard: 0, aVenir: 0 };
+
+    if (visite.statut === 1) {
+      entry.effectuee += 1;
+    } else if (new Date(visite.date) < now) {
+      entry.enRetard += 1;
+    } else {
+      entry.aVenir += 1;
+    }
+
+    counts.set(key, entry);
+  });
+
+  return timeline.map((key) => {
+    const entry = counts.get(key) ?? { effectuee: 0, enRetard: 0, aVenir: 0 };
+    return { key, label: bucketLabel(key, granularity), ...entry };
+  });
 }

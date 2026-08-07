@@ -3,7 +3,8 @@ import { getVisites, type VisiteItem } from "@/pages/Visite/api/visiteApi";
 import { getUsers, type UserItem } from "@/pages/Utilisateurs/api/utilisateurApi";
 import TimeSeriesCard from "./components/TimeSeriesCard";
 import CompletionRateCard from "./components/CompletionRateCard";
-import { buildTimeline, bucketKey, countVisitesByBucket, type Granularity } from "./utils/aggregateVisites";
+import { buildTimeline, countVisitesByBucketAndStatus, type Granularity } from "./utils/aggregateVisites";
+import type { StatusFilter } from "./components/StatusToggle";
 
 export default function Dashboard() {
   const [visites, setVisites] = useState<VisiteItem[]>([]);
@@ -22,6 +23,8 @@ export default function Dashboard() {
   const [anneeCompletion, setAnneeCompletion] = useState("");
   const [moisEffectuees, setMoisEffectuees] = useState(currentMonthValue);
   const [moisEmploye, setMoisEmploye] = useState(currentMonthValue);
+  const [statusFilterEffectuees, setStatusFilterEffectuees] = useState<StatusFilter>("all");
+  const [statusFilterEmploye, setStatusFilterEmploye] = useState<StatusFilter>("all");
 
   useEffect(() => {
     const load = async () => {
@@ -41,8 +44,6 @@ export default function Dashboard() {
 
     load();
   }, []);
-
-  const visitesEffectuees = useMemo(() => visites.filter((v) => v.statut === 1), [visites]);
 
   const anneesDisponibles = useMemo(() => {
     const years = new Set<number>();
@@ -77,8 +78,8 @@ export default function Dashboard() {
     [granulariteEffectuees, refDateEffectuees]
   );
   const dataEffectuees = useMemo(
-    () => countVisitesByBucket(visitesEffectuees, granulariteEffectuees, timelineEffectuees),
-    [visitesEffectuees, granulariteEffectuees, timelineEffectuees]
+    () => countVisitesByBucketAndStatus(visites, granulariteEffectuees, timelineEffectuees),
+    [visites, granulariteEffectuees, timelineEffectuees]
   );
 
   const visitesEmploye = useMemo(
@@ -94,34 +95,9 @@ export default function Dashboard() {
     [granulariteEmploye, refDateEmploye]
   );
   const dataEmploye = useMemo(
-    () => countVisitesByBucket(visitesEmploye, granulariteEmploye, timelineEmploye),
+    () => countVisitesByBucketAndStatus(visitesEmploye, granulariteEmploye, timelineEmploye),
     [visitesEmploye, granulariteEmploye, timelineEmploye]
   );
-
-  const visitesEmployeFenetre = useMemo(
-    () =>
-      visitesEmploye.filter(
-        (v) => v.date && timelineEmploye.includes(bucketKey(v.date, granulariteEmploye))
-      ),
-    [visitesEmploye, timelineEmploye, granulariteEmploye]
-  );
-  const nonEffectueesEmploye = useMemo(
-    () => visitesEmployeFenetre.filter((v) => v.statut !== 1).length,
-    [visitesEmployeFenetre]
-  );
-  const nonEffectueesEmployePercent =
-    visitesEmployeFenetre.length > 0 ? (nonEffectueesEmploye / visitesEmployeFenetre.length) * 100 : 0;
-
-  const enRetardEmploye = useMemo(
-    () =>
-      visitesEmployeFenetre.filter((v) => v.statut !== 1 && v.date && new Date(v.date) < new Date()).length,
-    [visitesEmployeFenetre]
-  );
-  const enRetardEmployePercent =
-    visitesEmployeFenetre.length > 0 ? (enRetardEmploye / visitesEmployeFenetre.length) * 100 : 0;
-  const aVenirEmploye = Math.max(nonEffectueesEmploye - enRetardEmploye, 0);
-  const aVenirEmployePercent =
-    visitesEmployeFenetre.length > 0 ? (aVenirEmploye / visitesEmployeFenetre.length) * 100 : 0;
 
   if (loading) {
     return (
@@ -165,11 +141,12 @@ export default function Dashboard() {
 
       <TimeSeriesCard
         title="Visites effectuées"
-        subtitle="Nombre total de visites marquées comme effectuées"
+        subtitle="Effectuées, en retard ou à venir — choisis ce qui s'affiche"
         data={dataEffectuees}
         granularity={granulariteEffectuees}
         onGranularityChange={setGranulariteEffectuees}
-        color="#2a78d6"
+        statusFilter={statusFilterEffectuees}
+        onStatusFilterChange={setStatusFilterEffectuees}
         extraControls={
           granulariteEffectuees === "day" ? (
             <input
@@ -184,11 +161,12 @@ export default function Dashboard() {
 
       <TimeSeriesCard
         title="Visites par employé"
-        subtitle="Nombre de visites (planifiées et effectuées)"
+        subtitle="Effectuées, en retard ou à venir — choisis ce qui s'affiche"
         data={dataEmploye}
         granularity={granulariteEmploye}
         onGranularityChange={setGranulariteEmploye}
-        color="#eb6834"
+        statusFilter={statusFilterEmploye}
+        onStatusFilterChange={setStatusFilterEmploye}
         extraControls={
           <>
             {granulariteEmploye === "day" && (
@@ -212,35 +190,6 @@ export default function Dashboard() {
               ))}
             </select>
           </>
-        }
-        extraStats={
-          <div>
-            <div className="flex flex-wrap gap-6">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#4a3aa7" }} />
-                <span className="text-gray-600">Non effectuées</span>
-                <span className="font-semibold text-gray-900">
-                  {nonEffectueesEmploye.toLocaleString("fr-FR")} ({nonEffectueesEmployePercent.toFixed(0)}%)
-                </span>
-              </div>
-            </div>
-            <div className="mt-2 flex flex-wrap gap-6 pl-1 text-xs text-gray-500">
-              <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#d03b3b" }} />
-                dont en retard :{" "}
-                <span className="font-medium text-gray-700">
-                  {enRetardEmploye.toLocaleString("fr-FR")} ({enRetardEmployePercent.toFixed(0)}%)
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#9ca3af" }} />
-                dont à venir :{" "}
-                <span className="font-medium text-gray-700">
-                  {aVenirEmploye.toLocaleString("fr-FR")} ({aVenirEmployePercent.toFixed(0)}%)
-                </span>
-              </div>
-            </div>
-          </div>
         }
       />
     </div>

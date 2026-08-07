@@ -11,6 +11,9 @@ import { getZones } from "../api/zoneApi";
 import ClientInfoModal from "../components/ClientInfoModal";
 import { SquareArrowOutUpRight, File } from "lucide-react";
 import { exportClientsToExcel } from "../utils/exportClientsToExcel";
+import { getVisites, getVisiteByIdUser } from "@/pages/Visite/api/visiteApi";
+import { getRapportB2BByIdVisite, getRapportRetailByIdVisite } from "@/pages/Visite/api/rapportVisiteApi";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 type QrCodeFilter = "all" | "with" | "without";
 
@@ -27,6 +30,55 @@ export default function ListeClient() {
   const [error, setError] = useState("");
   const [exporting, setExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState<{ done: number; total: number } | null>(null);
+
+  // dernière visite effectuée par client
+  const { user, isAdmin } = useCurrentUser();
+  const [derniereVisiteByClient, setDerniereVisiteByClient] = useState<Map<number, string>>(new Map());
+
+  useEffect(() => {
+    if (!user || clients.length === 0) return;
+
+    const loadDernieresVisites = async () => {
+      try {
+        const visites = isAdmin ? await getVisites() : await getVisiteByIdUser(user.id);
+
+        // dernière visite effectuée (par date de visite) pour chaque client
+        const derniereVisiteByClientId = new Map<number, (typeof visites)[number]>();
+        visites.forEach((visite) => {
+          if (visite.statut !== 1 || !visite.date || !visite.client?.id) return;
+          const current = derniereVisiteByClientId.get(visite.client.id);
+          if (!current || new Date(visite.date) > new Date(current.date)) {
+            derniereVisiteByClientId.set(visite.client.id, visite);
+          }
+        });
+
+        // la date affichée est celle du rapport (B2B ou retail) de cette visite
+        const entries = await Promise.all(
+          Array.from(derniereVisiteByClientId.entries()).map(async ([clientId, visite]) => {
+            const client = clients.find((c) => c.id === clientId);
+            const isB2B = client?.categorie_client?.statut === "B2B";
+
+            const rapport = isB2B
+              ? await getRapportB2BByIdVisite(visite.id).catch(() => null)
+              : await getRapportRetailByIdVisite(visite.id).catch(() => null);
+
+            return [clientId, rapport?.created_at ?? null] as const;
+          })
+        );
+
+        const map = new Map<number, string>();
+        entries.forEach(([clientId, date]) => {
+          if (date) map.set(clientId, date);
+        });
+
+        setDerniereVisiteByClient(map);
+      } catch {
+        // Pas bloquant : la colonne restera vide si les visites ne chargent pas.
+      }
+    };
+
+    loadDernieresVisites();
+  }, [user, isAdmin, clients]);
 
   // filters data state
   const [agenceOptions, setAgenceOptions] = useState<agencetItem[]>([]);
@@ -264,6 +316,7 @@ export default function ListeClient() {
               <th className=" px-2 py-3">Quartier</th>
               <th className=" px-2 py-3">Categorie</th>
               <th className=" px-2 py-3">Avec Qr code</th>
+              <th className=" px-2 py-3">Dernière visite</th>
             </tr>
           </thead>
           <tbody>
@@ -322,6 +375,11 @@ export default function ListeClient() {
                     >
                       {client.status_qrcode ? "Oui" : "Non"}
                     </span>
+                  </td>
+                  <td className="px-2 py-3 text-gray-500">
+                    {derniereVisiteByClient.has(client.id)
+                      ? new Date(derniereVisiteByClient.get(client.id)!).toLocaleDateString("fr-FR")
+                      : "—"}
                   </td>
                 </tr>
               );
