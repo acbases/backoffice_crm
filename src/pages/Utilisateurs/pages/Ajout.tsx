@@ -65,7 +65,7 @@ export default function Ajout() {
 
   return (
     <div className="m-4 max-w-xl space-y-6">
-      <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      {/* <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900">Importer depuis Allpro RH</h2>
         <p className="text-sm text-gray-500">
           Les utilisateurs seront importés depuis Allpro RH et ajoutés à la liste des utilisateurs du CRM.
@@ -89,7 +89,7 @@ export default function Ajout() {
         <span className="h-px flex-1 bg-gray-200" />
         ou
         <span className="h-px flex-1 bg-gray-200" />
-      </div>
+      </div> */}
 
       <form
         onSubmit={handleSubmit}
