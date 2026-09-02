@@ -16,8 +16,19 @@ export type UserItem = {
   role_crm: string;
 };
 
+// export async function getUsers() {
+//   const { data } = await api.get<UserItem[]>("/users");
+
+//   return [...data].sort((a, b) =>
+//     `${a.firstname} ${a.name}`.localeCompare(
+//       `${b.firstname} ${b.name}`,
+//       "fr",
+//       { sensitivity: "base" }
+//     )
+//   );
+// }
 export async function getUsers() {
-  const { data } = await api.get<UserItem[]>("/users");
+  const { data } = await api.get<UserItem[]>("/users-actif");
 
   return [...data].sort((a, b) =>
     `${a.firstname} ${a.name}`.localeCompare(
@@ -64,6 +75,13 @@ export async function getUserByMatricule(matricule: string) {
 export async function updateRoleUser(id: number, role_crm: string) {
 
   const { data } = await api.post<UserItem>(`/update-role`, { id, role_crm });
+  return data;
+
+}
+
+export async function DeleteUser(id: number) {
+
+  const { data } = await api.post<UserItem>(`/delete-user`, {id});
   return data;
 
 }

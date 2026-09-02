@@ -20,6 +20,9 @@ function RapportB2BInfo({
     rapport,
     loading,
 }: RapportB2BInfoProps) {
+    // Les URLs sont déjà transformées par l'intercepteur axios
+    const getImageUrl = (url: string | null | undefined) => url || "";
+
     if (loading) {
         return (
             <div className="p-6">
@@ -149,8 +152,8 @@ function RapportB2BInfo({
                 </div>
                 {/* Photo */}
                 {rapport.sary && (
-                    <div className="bg-white border rounded-xl overflow-y-auto">
-                        <div className="flex items-center gap-2 mb-4">
+                    <div className="w-80 h-96 bg-white border rounded-xl overflow-y-auto flex flex-col">
+                        <div className="flex items-center gap-2 mb-4 p-4">
                             <ImageIcon
                                 size={18}
                                 className="text-pink-500"
@@ -161,9 +164,13 @@ function RapportB2BInfo({
                         </div>
 
                         <img
-                            src={rapport.sary}
+                            src={getImageUrl(rapport.sary)}
                             alt="Rapport"
-                            className="rounded-lg border max-h-96 object-cover"
+                            className="rounded-lg border flex-1 w-full object-cover"
+                            onError={(e) => {
+                                console.error("Erreur chargement image B2B:", rapport.sary);
+                                (e.target as HTMLImageElement).alt = "Erreur chargement image";
+                            }}
                         />
                     </div>
                 )}

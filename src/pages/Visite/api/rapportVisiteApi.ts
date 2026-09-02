@@ -4,6 +4,56 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? "",
 });
 
+// Intercepteur pour transformer les URLs des images
+api.interceptors.response.use((response) => {
+  if (response.data) {
+    const transformUrl = (url: string | null | undefined): string | null | undefined => {
+      if (!url || typeof url !== "string") return url;
+      
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "";
+      
+      // Si c'est une URL complète, extraire le chemin et le reconstruire
+      if (url.startsWith("http")) {
+        try {
+          const urlObj = new URL(url);
+          const path = urlObj.pathname;
+          const serverBase = apiBase.replace(/\/api\/?$/, "");
+          const newUrl = `${serverBase}${path}`;
+          console.log("Image URL transformed:", {
+            original: url,
+            path,
+            serverBase,
+            newUrl
+          });
+          return newUrl;
+        } catch (e) {
+          console.error("Error transforming URL:", url, e);
+          return url;
+        }
+      }
+      
+      return url;
+    };
+
+    // Transformer les données pour les rapports B2B et Retail
+    if (Array.isArray(response.data)) {
+      response.data = response.data.map((item: any) => {
+        if (item.sary) {
+          item.sary = transformUrl(item.sary);
+        }
+        return item;
+      });
+    } else if (response.data && typeof response.data === 'object') {
+      if (response.data.sary) {
+        response.data.sary = transformUrl(response.data.sary);
+      }
+    }
+  }
+
+  return response;
+});
+
+
 /* =========================
    Rapport B2B
 ========================= */

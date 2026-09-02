@@ -35,6 +35,9 @@ function RapportViewAndRetailInfo({
     loadingVueRapportPlv,
     loadingRapportRetail,
 }: RapportViewAndRetailInfoProps) {
+    // Les URLs sont déjà transformées par l'intercepteur axios
+    const getImageUrl = (url: string | null | undefined) => url || "";
+
     const loading =
         loadingVueRapportProduits ||
         loadingVueRapportAutresProduits ||
@@ -196,28 +199,30 @@ function RapportViewAndRetailInfo({
                     </div>
                 </div>
 
-                {/* Photo - toujours affichée, avec fallback */}
-                <div className="min-w-[320px] max-w-[420px] bg-white border rounded-xl overflow-y-auto">
-                    <div className="flex items-center gap-2 mb-4 p-4">
-                        <ImageIcon
-                            size={18}
-                            className="text-pink-500"
-                        />
-                        <h3 className="font-semibold">
-                            Pièce jointe
-                        </h3>
-                    </div>
+                {/* Photo */}
+                {rapportRetail?.sary && (
+                    <div className="w-80 h-96 bg-white border rounded-xl overflow-y-auto flex flex-col">
+                        <div className="flex items-center gap-2 mb-4 p-4">
+                            <ImageIcon
+                                size={18}
+                                className="text-pink-500"
+                            />
+                            <h3 className="font-semibold">
+                                Pièce jointe
+                            </h3>
+                        </div>
 
-                    {rapportRetail?.sary ? (
                         <img
-                            src={rapportRetail.sary}
+                            src={getImageUrl(rapportRetail.sary)}
                             alt="Rapport"
-                            className="rounded-lg border max-h-96 w-full object-cover"
+                            className="rounded-lg border flex-1 w-full object-cover"
+                            onError={(e) => {
+                                console.error("Erreur chargement image:", rapportRetail.sary);
+                                (e.target as HTMLImageElement).alt = "Erreur chargement image";
+                            }}
                         />
-                    ) : (
-                        <p className="text-gray-500 px-4 pb-4">Aucune photo.</p>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
             {/* Rapport Retail */}
         </div>

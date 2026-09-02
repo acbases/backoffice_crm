@@ -1,14 +1,15 @@
 import { useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { File } from "lucide-react";
+import { File, Trash2  } from "lucide-react";
 import type { UtilisateursContext } from "../Utilisateur";
 import { exportUtilisateursToExcel } from "../utils/exportUtilisateursToExcel";
+import { DeleteUser } from "../api/utilisateurApi";
 
 const normalizeText = (value: string | null | undefined) =>
   (value ?? "").trim().toLowerCase();
 
 export default function Liste() {
-  const { utilisateurs, loading } = useOutletContext<UtilisateursContext>();
+  const { utilisateurs, loading, loadUtilisateurs  } = useOutletContext<UtilisateursContext>();
   const [nomFilter, setNomFilter] = useState("");
   const [exporting, setExporting] = useState(false);
 
@@ -20,6 +21,22 @@ export default function Liste() {
       console.error("Erreur lors de l'extraction Excel :", err);
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
+      return;
+    }
+
+    try {
+      await DeleteUser(id);
+
+      // Actualiser la liste
+      await loadUtilisateurs ();
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
+      alert("Erreur lors de la suppression de l'utilisateur.");
     }
   };
 
@@ -87,6 +104,7 @@ export default function Liste() {
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Rôle</th>
               <th className="px-4 py-3">Statut</th>
+              <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -114,6 +132,15 @@ export default function Liste() {
                   >
                     {utilisateur.statut ? "Actif" : "Inactif"}
                   </span>
+                </td>
+                <td className="flex items-center justify-end gap-2 px-4 py-3">
+                  <button
+                    onClick={() => handleDelete(utilisateur.id)}
+                    className="p-2 text-red-600 rounded-md hover:bg-red-100 transition"
+                    title="Supprimer"
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </td>
               </tr>
             ))}
