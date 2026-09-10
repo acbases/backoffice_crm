@@ -24,3 +24,9 @@ export async function getFournisseurClientByIdClient(idClient: number) {
   );
   return data ?? [];
 }
+
+// tous les fournisseurClient actifs, tous clients confondus (utilisé pour l'export en masse)
+export async function getAllFournisseurClients() {
+  const { data } = await api.get<FournisseurClientItem[]>("/fournisseurClients");
+  return data ?? [];
+}

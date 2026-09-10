@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
 import { createClient } from "../api/clientApi";
 import { getAgences, type agencetItem } from "../api/agenceApi";
 import {
@@ -21,7 +20,6 @@ const initialForm = {
 };
 
 export default function AjoutClient() {
-  const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

@@ -4,8 +4,8 @@ import type { ClientsContext } from "../Clients";
 import { getClientQrCode, updateClient } from "../api/clientApi";
 import { generateQrStickerImage } from "../utils/generateQrStickerImage";
 
-const getQuartierLabel = (quartier: string | { intitule: string }) =>
-  typeof quartier === "object" ? quartier.intitule : quartier;
+const getQuartierLabel = (quartier: string | { intitule: string } | null) =>
+  quartier && typeof quartier === "object" ? quartier.intitule : quartier;
 
 export default function ClientQrCode() {
   const { idclient } = useParams<{ idclient: string }>();

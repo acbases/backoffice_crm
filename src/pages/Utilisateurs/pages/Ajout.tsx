@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { createUser, importUsersFromAllproRh } from "../api/utilisateurApi";
+import { createUser } from "../api/utilisateurApi";
 import type { UtilisateursContext } from "../Utilisateur";
 
 const ROLES = ["admin", "utilisateur"];
@@ -24,26 +24,8 @@ export default function Ajout() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [importing, setImporting] = useState(false);
-  const [importError, setImportError] = useState("");
-
   const handleChange = (field: keyof typeof initialForm, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
-  };
-
-  const handleImportFromAllpro = async () => {
-    setImporting(true);
-    setImportError("");
-
-    try {
-      await importUsersFromAllproRh();
-      await loadUtilisateurs();
-      navigate("../liste");
-    } catch {
-      setImportError("Impossible d'importer les utilisateurs depuis Allpro RH.");
-    } finally {
-      setImporting(false);
-    }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {

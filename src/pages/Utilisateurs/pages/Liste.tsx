@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { File, Trash2  } from "lucide-react";
 import type { UtilisateursContext } from "../Utilisateur";
 import { exportUtilisateursToExcel } from "../utils/exportUtilisateursToExcel";
-import { DeleteUser } from "../api/utilisateurApi";
+import { DeleteUser, getAll } from "../api/utilisateurApi";
 
 const normalizeText = (value: string | null | undefined) =>
   (value ?? "").trim().toLowerCase();
@@ -16,7 +16,9 @@ export default function Liste() {
   const handleExportExcel = async () => {
     setExporting(true);
     try {
-      await exportUtilisateursToExcel(filteredUtilisateurs);
+      // export de tous les utilisateurs (actifs et inactifs) avec leur statut
+      const allUtilisateurs = await getAll();
+      await exportUtilisateursToExcel(allUtilisateurs);
     } catch (err) {
       console.error("Erreur lors de l'extraction Excel :", err);
     } finally {

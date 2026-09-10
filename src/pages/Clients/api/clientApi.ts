@@ -52,22 +52,38 @@ export type ClientItem = {
   latitude: string;
   longitude: string;
   zone: string;
-  quartier: Quartier | string;
+  quartier: Quartier | string | null;
   idagence: number;
   idcategorie: number;
   status_qrcode: boolean;
+  statut: boolean;
   created_at: string | null;
   updated_at: string | null;
   agence: Agence;
   categorie_client: CategorieClient;
 };
 
-export async function getClients() {
-  const { data } = await api.get<ClientItem[]>("/clients");
-
-  return [...data].sort((a, b) =>
+const sortByNom = (data: ClientItem[]) =>
+  [...data].sort((a, b) =>
     a.nom.localeCompare(b.nom, "fr", { sensitivity: "base" })
   );
+
+// GET all clients, actifs et inactifs (utilisé pour l'export)
+export async function getAllClients() {
+  const { data } = await api.get<ClientItem[]>("/clients");
+  return sortByNom(data);
+}
+
+// GET clients actifs uniquement (utilisé pour l'affichage de la liste)
+export async function getClientsActif() {
+  const { data } = await api.get<ClientItem[]>("/clients-actif");
+  return sortByNom(data);
+}
+
+// POST désactive un client (suppression logique via statut)
+export async function deleteClient(id: number) {
+  const { data } = await api.post<ClientItem>(`/client/${id}/statut`);
+  return data;
 }
 
 // get client qr code 

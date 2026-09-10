@@ -3,7 +3,6 @@
 import {
     ClipboardList,
     User,
-    Phone,
     Building2,
     Calendar,
     Image as ImageIcon,

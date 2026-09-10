@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { getVisites, type VisitesItem } from "../api/visiteApi";
+import { getVisitesActif, type VisiteItem } from "../api/visiteApi";
 import { getVisiteByIdUser } from "../api/visiteApi";
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -17,19 +17,19 @@ function toDateKey(date: Date): string {
 
 
 export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
-    const [visites, setVisites] = useState<VisitesItem[]>([]);
+    const [visites, setVisites] = useState<VisiteItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [currentMonth, setCurrentMonth] = useState(() => new Date());
     const { user, isAdmin } = useCurrentUser();
     const [hoveredVisite, setHoveredVisite] = useState<{
-        visite: VisitesItem;
+        visite: VisiteItem;
         x: number;
         y: number;
     } | null>(null);
     const [selectedDayVisites, setSelectedDayVisites] = useState<{
         date: string;
-        visites: VisitesItem[];
+        visites: VisiteItem[];
     } | null>(null);
 
     const loadVisites = useCallback(async () => {
@@ -39,8 +39,8 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
         setError("");
         try {
             const data = isAdmin
-                    ? await getVisites()
-                    : await getVisiteByIdUser(user.id);
+                    ? await getVisitesActif()
+                    : (await getVisiteByIdUser(user.id)).filter((visite) => !visite.delete);
 
             setVisites(data);
 
@@ -85,7 +85,7 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
 
     // ⬇️ Ne se recalcule QUE si `visites` change (pas à chaque hover)
     const visitesByDay = useMemo(() => {
-        const map = new Map<string, VisitesItem[]>();
+        const map = new Map<string, VisiteItem[]>();
         visites.forEach((visite) => {
             if (!visite.date) return;
             const key = visite.date.slice(0, 10);
@@ -107,7 +107,7 @@ export default function CalendarVisites({ refreshKey }: CalendarVisitesProps) {
         setCurrentMonth((c) => new Date(c.getFullYear(), c.getMonth() + 1, 1));
     const goToToday = () => setCurrentMonth(new Date());
 
-    const getVisiteColor = (visite: VisitesItem) => {
+    const getVisiteColor = (visite: VisiteItem) => {
         // Visite faite → vert
         if (visite.statut === 1) {
             return "bg-green-100 border-green-300 text-green-700";

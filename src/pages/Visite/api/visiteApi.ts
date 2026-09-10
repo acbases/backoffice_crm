@@ -33,6 +33,7 @@ export type VisiteItem = {
   statut: number;
   type: number;
   idtype: number;
+  delete: boolean;
   created_at: string;
   updated_at: string;
   object: string | null;
@@ -85,6 +86,11 @@ export async function getVisites() {
   return data;
 }
 
+export async function getVisitesActif() {
+  const { data } = await api.get<VisiteItem[]>("/visites-actif");
+  return data;
+}
+
 export type UpdateVisitePayload = Partial<{
   idclient: number;
   idutilisateur: number;
@@ -101,6 +107,11 @@ export async function updateVisite(
   payload: UpdateVisitePayload
 ) {
   const { data } = await api.put<VisiteItem>(`/visite/${id}`, payload);
+  return data;
+}
+
+export async function deleteVisite(id: number) {
+  const { data } = await api.post<VisiteItem>(`/visite/${id}/delete`);
   return data;
 }
 

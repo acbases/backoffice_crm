@@ -6,7 +6,6 @@ import RequireAdmin from "./components/RequireAdmin";
 import AjoutClient from "./pages/Clients/pages/AjoutClient";
 import ListeClient from "./pages/Clients/pages/ListeClient";
 import MapsClient from "./pages/Clients/pages/MapsClient";
-import AjoutVisite from "./pages/Visite/pages/AjoutVisite";
 import ListeVisite from "./pages/Visite/pages/ListeVisite";
 import VisitesPage from "./pages/Visite/pages/VisitesPage";
 import ClientQrCode from "./pages/Clients/pages/QrCode";
@@ -15,7 +14,6 @@ import Utilisateurs from "./pages/Utilisateurs/Utilisateur";
 import Ajout from "./pages/Utilisateurs/pages/Ajout";
 import Liste from "./pages/Utilisateurs/pages/Liste";
 import ModifRole from "./pages/Utilisateurs/pages/ModifRole";
-import { useEffect, useState } from "react";
 import { UserProvider } from "./context/UserContext";
 
 

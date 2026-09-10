@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
 import { createVisite } from "../api/visiteApi";
-import { getClients, type ClientItem } from '@/pages/Clients/api/clientApi';
+import { getClientsActif, type ClientItem } from '@/pages/Clients/api/clientApi';
 import { getUsers, type UserItem } from '@/pages/Utilisateurs/api/utilisateurApi';
 import { getTypeVisites, type TypeVisiteItem } from '../api/typeVisiteApi';
 import { getCategorieVisites, type CategorieVisiteItem } from '../api/categorieVisiteApi';
-import { getVisites, type VisiteItem } from "../api/visiteApi";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const initialForm = {
@@ -25,7 +23,6 @@ type AjoutVisiteProps = {
 };
 
 export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
-    const navigate = useNavigate();
     const [form, setForm] = useState(initialForm);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -47,7 +44,7 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
         const loadCategorieAgenceData = async () => {
             try {
                 const [ClientsData, UsersData, TypeVisiteData, CategorieVisiteData] = await Promise.all([
-                    getClients(),
+                    getClientsActif(),
                     getUsers(), 
                     getTypeVisites(),
                     getCategorieVisites()

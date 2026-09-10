@@ -3,6 +3,7 @@ type VisiteItem = {
     date: string;
     statut: number;
     type: number;
+    delete?: boolean;
     object?: string | null;
 
     client?: {
@@ -46,6 +47,7 @@ const HEADERS = [
     "Date",
     "Statut",
     "Objet",
+    "Supprimer",
 ];
 
 const HEADER_FILL = "FF2E7D32"; // vert
@@ -82,6 +84,7 @@ export const exportVisitesToExcel = async (visites: VisiteItem[]) => {
             visite.date,
             statut,
             visite.object ?? "",
+            visite.delete ? "Oui" : "Non",
         ];
     });
 

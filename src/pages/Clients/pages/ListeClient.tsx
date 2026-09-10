@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useOutletContext, useSearchParams, useParams } from "react-router-dom";
 import type { ClientsContext } from "../Clients";
 import ClientFilters from "../components/ClientFilters";
-import { getClients, type ClientItem } from "../api/clientApi";
+import { getAllClients, deleteClient, type ClientItem } from "../api/clientApi";
 
 import { getAgences, type agencetItem } from "../api/agenceApi";
 import { getCategorieClients, type categorieClientItem } from "../api/categorieClientApi";
 import { getQuartiers } from "../api/quartierApi";
 import { getZones } from "../api/zoneApi";
 import ClientInfoModal from "../components/ClientInfoModal";
-import { SquareArrowOutUpRight, File } from "lucide-react";
+import { SquareArrowOutUpRight, File, Trash2 } from "lucide-react";
 import { exportClientsToExcel } from "../utils/exportClientsToExcel";
 import { getVisites, getVisiteByIdUser } from "@/pages/Visite/api/visiteApi";
 import { getRapportB2BByIdVisite, getRapportRetailByIdVisite } from "@/pages/Visite/api/rapportVisiteApi";
@@ -21,13 +21,13 @@ const normalizeText = (value: string | null | undefined) =>
   (value ?? "").trim().toLowerCase();
 
 const getQuartierLabel = (quartier: ClientItem["quartier"]) =>
-  typeof quartier === "object" ? quartier.intitule : quartier;
+  quartier && typeof quartier === "object" ? quartier.intitule : quartier;
 
 export default function ListeClient() {
   // client states
   
-  const { clients, setSelectedClientId, loading, loadClients } = useOutletContext<ClientsContext>();
-  const [error, setError] = useState("");
+  const { clients, loading, loadClients } = useOutletContext<ClientsContext>();
+  const [error] = useState("");
   const [exporting, setExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState<{ done: number; total: number } | null>(null);
 
@@ -192,9 +192,11 @@ export default function ListeClient() {
 
   const handleExportExcel = async () => {
     setExporting(true);
-    setExportProgress({ done: 0, total: filteredClients.length });
     try {
-      await exportClientsToExcel(filteredClients, (done, total) =>
+      // export de tous les clients (actifs et inactifs) avec leur statut
+      const allClients = await getAllClients();
+      setExportProgress({ done: 0, total: allClients.length });
+      await exportClientsToExcel(allClients, (done, total) =>
         setExportProgress({ done, total })
       );
     } catch (err) {
@@ -202,6 +204,20 @@ export default function ListeClient() {
     } finally {
       setExporting(false);
       setExportProgress(null);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Voulez-vous vraiment supprimer ce client ?")) {
+      return;
+    }
+
+    try {
+      await deleteClient(id);
+      await loadClients();
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
+      alert("Erreur lors de la suppression du client.");
     }
   };
 
@@ -317,12 +333,13 @@ export default function ListeClient() {
               <th className=" px-2 py-3">Categorie</th>
               <th className=" px-2 py-3">Avec Qr code</th>
               <th className=" px-2 py-3">Dernière visite</th>
+              <th className=" px-2 py-3"></th>
             </tr>
           </thead>
           <tbody>
             {filteredClients.length === 0 ? (
               <tr>
-                <td className="px-2 py-8 text-center text-sm text-gray-500" colSpan={8}>
+                <td className="px-2 py-8 text-center text-sm text-gray-500" colSpan={9}>
                   No clients match the selected filters.
                 </td>
               </tr>
@@ -380,6 +397,15 @@ export default function ListeClient() {
                     {derniereVisiteByClient.has(client.id)
                       ? new Date(derniereVisiteByClient.get(client.id)!).toLocaleDateString("fr-FR")
                       : "—"}
+                  </td>
+                  <td className="px-2 py-3">
+                    <button
+                      onClick={() => handleDelete(client.id)}
+                      className="p-2 text-red-600 rounded-md hover:bg-red-100 transition"
+                      title="Supprimer"
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   </td>
                 </tr>
               );

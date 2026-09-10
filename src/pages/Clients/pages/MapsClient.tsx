@@ -1,5 +1,4 @@
 // ClientMap.tsx
-import { useLocation } from "react-router-dom";
 import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
 import type { ClientItem } from "../api/clientApi";
 import { useSearchParams } from "react-router-dom";
@@ -12,18 +11,6 @@ import { getAgences, type agencetItem } from "../api/agenceApi";
 import { getCategorieClients, type categorieClientItem } from "../api/categorieClientApi";
 import { getQuartiers } from "../api/quartierApi";
 import { getZones } from "../api/zoneApi";
-
-// const containerStyle = {
-//     width: "100%",
-//     height: "100vh",
-//     marginTop: "50px",
-//     marginLeft: "20px",
-// };
-const containerStyle = {
-    width: "100%",
-    height: "100%",
-};
-
 
 export default function MapsClient() {
     const { clients } = useOutletContext<ClientsContext>();
@@ -89,7 +76,7 @@ export default function MapsClient() {
         (v ?? "").trim().toLowerCase();
 
     const getQuartierLabel = (q: ClientItem["quartier"]) =>
-        typeof q === "object" ? q.intitule : q;
+        q && typeof q === "object" ? q.intitule : q;
 
     const filteredClients = useMemo(() => {
         return clients.filter((client) => {

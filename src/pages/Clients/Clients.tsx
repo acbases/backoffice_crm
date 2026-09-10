@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from "react";
 import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
-import { getClients, type ClientItem } from "./api/clientApi";
+import { getClientsActif, type ClientItem } from "./api/clientApi";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export function ClientIndexRedirect() {
@@ -27,7 +27,7 @@ export default function Clients() {
   const loadClients = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getClients();
+      const data = await getClientsActif();
       setClients(data);
     } catch (error) {
       console.error("Failed to load clients:", error);

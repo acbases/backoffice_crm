@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 
 import {
   getClientById,
@@ -34,9 +33,6 @@ export default function ClientInfoModal({
   id,
   onSuccess,
 }: UpdateClientProps) {
-  // const { id } = useParams();
-  const navigate = useNavigate();
-
   const [form, setForm] = useState(initialForm);
 
   const [loading, setLoading] = useState(false);
@@ -78,7 +74,7 @@ export default function ClientInfoModal({
           quartier:
             typeof client.quartier === "string"
               ? client.quartier
-              : client.quartier.intitule,
+              : client.quartier?.intitule ?? "",
           idagence: client.idagence.toString(),
           idcategorie: client.idcategorie.toString(),
         });

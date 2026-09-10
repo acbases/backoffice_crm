@@ -1,14 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
-import { Navigate, useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import type { VisitesContext } from "../Visite";
-import { getVisites } from "../api/visiteApi";
+import { getVisites, getVisitesActif, deleteVisite } from "../api/visiteApi";
 import DetailVisite from "../components/DetailVisite";
 import ListeVisiteMobile from "../components/ListeVisiteMobile";
 import { getFilteredVisites } from "../utils/FilteredVisites";
 
 //filters
-import { type ClientItem, getClients } from "@/pages/Clients/api/clientApi";
+import { type ClientItem, getClientsActif } from "@/pages/Clients/api/clientApi";
 import VisiteFilters from "../components/VisiteFilter";
 import { getUsers, type UserItem } from "@/pages/Utilisateurs/api/utilisateurApi";
 import { getTypeVisites, type TypeVisiteItem } from "../api/typeVisiteApi";
@@ -16,7 +16,7 @@ import { getCategorieVisites, type CategorieVisiteItem } from "../api/categorieV
 import { getVisiteByIdUser } from "../api/visiteApi";
 import { getZones } from "@/pages/Clients/api/zoneApi";
 import { getQuartiers } from "@/pages/Clients/api/quartierApi";
-import { File, SquareArrowOutUpRight } from "lucide-react";
+import { File, SquareArrowOutUpRight, Trash2 } from "lucide-react";
 
 import { exportVisitesToExcel } from "../utils/ExportVisitesToExcel";
 
@@ -28,40 +28,55 @@ function ListeVisite() {
         useOutletContext<VisitesContext>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [, setIsModalOpen] = useState(false);
+    const [, setSelectedId] = useState<string | null>(null);
     const [exporting, setExporting] = useState(false);
 
     const { user, isAdmin } = useCurrentUser();
 
     // visites loading
-    useEffect(() => {
+    const loadVisite = useCallback(async () => {
         if (!user) return; // attend que l'utilisateur soit chargé pour connaître son id/rôle
 
-        const loadVisite = async () => {
-            setLoading(true);
-            setError("");
-            try {
-                const data = isAdmin
-                    ? await getVisites()
-                    : await getVisiteByIdUser(user.id);
+        setLoading(true);
+        setError("");
+        try {
+            const data = isAdmin
+                ? await getVisitesActif()
+                : (await getVisiteByIdUser(user.id)).filter((visite) => !visite.delete);
 
-                setVisites(data);
+            setVisites(data);
 
-            } catch (err) {
-                if (!isAdmin) {
-                    // L'utilisateur n'a simplement aucune visite : pas une erreur.
-                    setVisites([]);
-                } else {
-                    console.error("Erreur chargement visites :", err);
-                    setError("Unable to load visites.");
-                }
-            } finally {
-                setLoading(false);
+        } catch (err) {
+            if (!isAdmin) {
+                // L'utilisateur n'a simplement aucune visite : pas une erreur.
+                setVisites([]);
+            } else {
+                console.error("Erreur chargement visites :", err);
+                setError("Unable to load visites.");
             }
-        };
-        loadVisite();
+        } finally {
+            setLoading(false);
+        }
     }, [setVisites, user, isAdmin]);
+
+    useEffect(() => {
+        loadVisite();
+    }, [loadVisite]);
+
+    const handleDelete = async (id: number) => {
+        if (!window.confirm("Voulez-vous vraiment supprimer cette visite ?")) {
+            return;
+        }
+
+        try {
+            await deleteVisite(id);
+            await loadVisite();
+        } catch (error) {
+            console.error("Erreur lors de la suppression :", error);
+            alert("Erreur lors de la suppression de la visite.");
+        }
+    };
 
     // filters data state 
     const [clientsOptions, setClientsOptions] = useState<ClientItem[]>([])
@@ -71,13 +86,13 @@ function ListeVisite() {
     const [zoneOptions, setZoneOptions] = useState<string[]>([]);
     const [quartierOptions, setQuartierOptions] = useState<string[]>([]);
     type StatutOptions = ["A venir", "Terminée", "En retard"]
-    const [statutOptions, setStatutOptions] = useState<StatutOptions>(["A venir", "Terminée", "En retard"])
+    const [statutOptions] = useState<StatutOptions>(["A venir", "Terminée", "En retard"])
     // loading filters 
     useEffect(() => {
         const loadFilters = async () => {
             try {
                 const [clients, users, typeVisites, categorieVisites, zones, quartiers] = await Promise.all([
-                    getClients(),
+                    getClientsActif(),
                     getUsers(),
                     getTypeVisites(),
                     getCategorieVisites(),
@@ -351,7 +366,11 @@ function ListeVisite() {
                     onClick={async () => {
                         setExporting(true);
                         try {
-                            await exportVisitesToExcel(visites);
+                            // export de toutes les visites (actives et supprimées)
+                            const allVisites = isAdmin
+                                ? await getVisites()
+                                : await getVisiteByIdUser(user!.id);
+                            await exportVisitesToExcel(allVisites);
                         } catch (err) {
                             console.error("Erreur lors de l'extraction Excel :", err);
                         } finally {
@@ -409,6 +428,7 @@ function ListeVisite() {
                         <col className="w-[11%]" />
                         <col className="w-[9%]" />
                         <col className="w-[9%]" />
+                        {isAdmin ? <col className="w-[5%]" /> : null}
                     </colgroup>
                     <thead className="py-4">
                         <tr className="border-b border-gray-200 text-left text-xs font-medium text-gray-500 ">
@@ -423,6 +443,7 @@ function ListeVisite() {
                             <th><SortableHeader label="Quartier" sortKey="quartier" /></th>
                             <th><SortableHeader label="Date" sortKey="date" /></th>
                             <th><SortableHeader label="Statut" sortKey="statut" /></th>
+                            {isAdmin ? <th className="px-1 py-3"></th> : null}
                         </tr>
                     </thead>
                     <tbody>
@@ -509,7 +530,17 @@ function ListeVisite() {
                                     })()}
                                 </td>
 
-
+                                {isAdmin ? (
+                                    <td className="px-1 py-3">
+                                        <button
+                                            onClick={() => handleDelete(visite.id)}
+                                            className="p-2 text-red-600 rounded-md hover:bg-red-100 transition"
+                                            title="Supprimer"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </td>
+                                ) : null}
                             </tr>
                         ))}
                     </tbody>

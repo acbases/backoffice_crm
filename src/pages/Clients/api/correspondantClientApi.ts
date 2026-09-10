@@ -26,3 +26,9 @@ export async function getCorrespondantClientByIdClient(idClient: number) {
   );
   return data ?? [];
 }
+
+// tous les correspondantClient actifs, tous clients confondus (utilisé pour l'export en masse)
+export async function getAllCorrespondantClients() {
+  const { data } = await api.get<CorrespondantClientItem[]>("/correspondantClients");
+  return data ?? [];
+}

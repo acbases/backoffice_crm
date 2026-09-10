@@ -1,9 +1,9 @@
 import type { ClientItem } from "../api/clientApi";
-import { getFournisseurClientByIdClient } from "../api/fournisseurClientApi";
-import { getCorrespondantClientByIdClient } from "../api/correspondantClientApi";
+import { getAllFournisseurClients } from "../api/fournisseurClientApi";
+import { getAllCorrespondantClients } from "../api/correspondantClientApi";
 
 const getQuartierLabel = (quartier: ClientItem["quartier"]) =>
-  typeof quartier === "object" ? quartier.intitule : quartier;
+  quartier && typeof quartier === "object" ? quartier.intitule : quartier;
 
 const HEADERS = [
   "Nom",
@@ -12,6 +12,7 @@ const HEADERS = [
   "Quartier",
   "Catégorie",
   "Avec QR code",
+  "Statut",
   "Fournisseurs",
   "Correspondants",
 ];
@@ -20,35 +21,53 @@ const HEADER_FILL = "FF2E7D32"; // vert
 const MIN_COLUMN_WIDTH = 10;
 const MAX_COLUMN_WIDTH = 40;
 
+const groupByClientId = <T extends { idclient: number }>(items: T[]) => {
+  const map = new Map<number, T[]>();
+  items.forEach((item) => {
+    const bucket = map.get(item.idclient);
+    if (bucket) {
+      bucket.push(item);
+    } else {
+      map.set(item.idclient, [item]);
+    }
+  });
+  return map;
+};
+
 export const exportClientsToExcel = async (
   clients: ClientItem[],
   onProgress?: (done: number, total: number) => void
 ) => {
-  let done = 0;
   const total = clients.length;
+  onProgress?.(0, total);
 
-  const rows = await Promise.all(
-    clients.map(async (client) => {
-      const [fournisseurs, correspondants] = await Promise.all([
-        getFournisseurClientByIdClient(client.id).catch(() => []),
-        getCorrespondantClientByIdClient(client.id).catch(() => []),
-      ]);
+  // récupère fournisseurs/correspondants en 2 requêtes au lieu de 2 par client
+  const [fournisseurClients, correspondantClients] = await Promise.all([
+    getAllFournisseurClients().catch(() => []),
+    getAllCorrespondantClients().catch(() => []),
+  ]);
 
-      done += 1;
-      onProgress?.(done, total);
+  const fournisseursByClientId = groupByClientId(fournisseurClients);
+  const correspondantsByClientId = groupByClientId(correspondantClients);
 
-      return [
-        client.nom,
-        client.agence?.intitule ?? "",
-        client.zone ?? "",
-        getQuartierLabel(client.quartier) ?? "",
-        client.categorie_client?.intitule ?? "",
-        client.status_qrcode ? "Oui" : "Non",
-        fournisseurs.map((f) => f.fournisseur?.nom).filter(Boolean).join(", "),
-        correspondants.map((c) => c.correspondant?.nom).filter(Boolean).join(", "),
-      ];
-    })
-  );
+  const rows = clients.map((client, index) => {
+    const fournisseurs = fournisseursByClientId.get(client.id) ?? [];
+    const correspondants = correspondantsByClientId.get(client.id) ?? [];
+
+    onProgress?.(index + 1, total);
+
+    return [
+      client.nom,
+      client.agence?.intitule ?? "",
+      client.zone ?? "",
+      getQuartierLabel(client.quartier) ?? "",
+      client.categorie_client?.intitule ?? "",
+      client.status_qrcode ? "Oui" : "Non",
+      client.statut ? "Actif" : "Inactif",
+      fournisseurs.map((f) => f.fournisseur?.nom).filter(Boolean).join(", "),
+      correspondants.map((c) => c.correspondant?.nom).filter(Boolean).join(", "),
+    ];
+  });
 
   const { default: ExcelJS } = await import("exceljs");
   const workbook = new ExcelJS.Workbook();

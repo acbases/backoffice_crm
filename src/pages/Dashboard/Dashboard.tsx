@@ -160,7 +160,7 @@ export default function Dashboard() {
       />
 
       <TimeSeriesCard
-        title="Visites par employé"
+        title="Visites par commercial"
         subtitle="Effectuées, en retard ou à venir — choisis ce qui s'affiche"
         data={dataEmploye}
         granularity={granulariteEmploye}
@@ -182,7 +182,7 @@ export default function Dashboard() {
               onChange={(event) => setEmployeId(event.target.value)}
               className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 outline-none focus:border-red-500"
             >
-              <option value="">Tous les employés</option>
+              <option value="">Tous les commerciaux</option>
               {utilisateurs.map((u) => (
                 <option key={u.id} value={String(u.id)}>
                   {u.firstname} {u.name}

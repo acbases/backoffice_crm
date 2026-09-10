@@ -16,17 +16,17 @@ export type UserItem = {
   role_crm: string;
 };
 
-// export async function getUsers() {
-//   const { data } = await api.get<UserItem[]>("/users");
+export async function getAll() {
+  const { data } = await api.get<UserItem[]>("/users");
 
-//   return [...data].sort((a, b) =>
-//     `${a.firstname} ${a.name}`.localeCompare(
-//       `${b.firstname} ${b.name}`,
-//       "fr",
-//       { sensitivity: "base" }
-//     )
-//   );
-// }
+  return [...data].sort((a, b) =>
+    `${a.firstname} ${a.name}`.localeCompare(
+      `${b.firstname} ${b.name}`,
+      "fr",
+      { sensitivity: "base" }
+    )
+  );
+}
 export async function getUsers() {
   const { data } = await api.get<UserItem[]>("/users-actif");
 

@@ -12,7 +12,7 @@ const normalizeText = (value: string | null | undefined) =>
   (value ?? "").trim().toLowerCase();
 
 const getQuartierLabel = (quartier: ClientItem["quartier"]) =>
-  typeof quartier === "object" ? quartier.intitule : quartier;
+  quartier && typeof quartier === "object" ? quartier.intitule : quartier;
 
 export function useClientFilters(clients: ClientItem[]) {
   const [searchParams, setSearchParams] = useSearchParams();
