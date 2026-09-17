@@ -75,8 +75,8 @@ export default function ClientInfoModal({
             typeof client.quartier === "string"
               ? client.quartier
               : client.quartier?.intitule ?? "",
-          idagence: client.idagence.toString(),
-          idcategorie: client.idcategorie.toString(),
+          idagence: client.idagence?.toString() ?? "",
+          idcategorie: client.idcategorie?.toString() ?? "",
         });
       } catch (err) {
         console.error(err);
