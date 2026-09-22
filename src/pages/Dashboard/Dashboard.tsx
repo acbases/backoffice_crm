@@ -3,6 +3,8 @@ import { getVisites, type VisiteItem } from "@/pages/Visite/api/visiteApi";
 import { getUsers, type UserItem } from "@/pages/Utilisateurs/api/utilisateurApi";
 import TimeSeriesCard from "./components/TimeSeriesCard";
 import CompletionRateCard from "./components/CompletionRateCard";
+import ProduitsStatsCard from "./components/ProduitsStatsCard";
+import PlvStatsCard from "./components/PlvStatsCard";
 import { buildTimeline, countVisitesByBucketAndStatus, type Granularity } from "./utils/aggregateVisites";
 import type { StatusFilter } from "./components/StatusToggle";
 
@@ -192,6 +194,9 @@ export default function Dashboard() {
           </>
         }
       />
+
+      <ProduitsStatsCard />
+      <PlvStatsCard />
     </div>
   );
 }
