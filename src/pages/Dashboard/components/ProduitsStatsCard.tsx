@@ -5,6 +5,7 @@ import ProduitsVolumePieChart from "./ProduitsVolumePieChart";
 import OrigineBadge, { ORIGINE_ACCENT_COLOR, ORIGINE_EXTERNE_COLOR } from "./OrigineBadge";
 import ProduitDetailModal, { type ProduitDetailTarget } from "./ProduitDetailModal";
 import AgenceSelect from "./AgenceSelect";
+import Meter from "./Meter";
 
 const ACCENT_COLOR = ORIGINE_ACCENT_COLOR;
 const EXTERNE_COLOR = ORIGINE_EXTERNE_COLOR;
@@ -65,6 +66,14 @@ function ProductRow({
       </td>
       <td className="px-3 py-2 text-right tabular-nums text-gray-700">
         {formatPrice(produit.prix_vente_details_moyen)}
+      </td>
+      <td className="px-3 py-2">
+        <div className="flex items-center gap-2" title={`${produit.presence.nb_clients} / ${produit.presence.nb_clients_visites} clients`}>
+          <div className="w-16">
+            <Meter percent={produit.presence.taux_presence} />
+          </div>
+          <span className="tabular-nums text-gray-700">{formatPercent(produit.presence.taux_presence)}</span>
+        </div>
       </td>
     </tr>
   );
@@ -160,10 +169,16 @@ export default function ProduitsStatsCard() {
         <p className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</p>
       ) : stats ? (
         <>
-          <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-4">
             <StatTile label="Prix d'achat moyen" value={stats.prix_moyen_par_type.prix_achat} />
             <StatTile label="Prix de vente gros moyen" value={stats.prix_moyen_par_type.prix_vente_gros} />
             <StatTile label="Prix de vente détails moyen" value={stats.prix_moyen_par_type.prix_vente_details} />
+            <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <p className="text-xs font-medium text-gray-500">Clients visités</p>
+              <p className="mt-1 text-xl font-semibold text-gray-900">
+                {stats.nb_clients_visites.toLocaleString("fr-FR")}
+              </p>
+            </div>
           </div>
 
           <div className="mb-5">
@@ -201,6 +216,18 @@ export default function ProduitsStatsCard() {
                     {stats.meilleur_produit.nb_occurrences} relevé
                     {stats.meilleur_produit.nb_occurrences > 1 ? "s" : ""}
                   </p>
+                  <div
+                    className="mt-2 flex items-center gap-2"
+                    title={`${stats.meilleur_produit.presence.nb_clients} / ${stats.meilleur_produit.presence.nb_clients_visites} clients`}
+                  >
+                    <span className="text-xs text-gray-500">Présence</span>
+                    <div className="w-20">
+                      <Meter percent={stats.meilleur_produit.presence.taux_presence} />
+                    </div>
+                    <span className="text-xs font-semibold text-gray-700">
+                      {formatPercent(stats.meilleur_produit.presence.taux_presence)}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-5 text-sm">
                   <PriceStat label="Achat" value={stats.meilleur_produit.prix_achat_moyen} />
@@ -233,6 +260,7 @@ export default function ProduitsStatsCard() {
                       <th className="px-3 py-2 text-right">Prix achat moy.</th>
                       <th className="px-3 py-2 text-right">Prix gros moy.</th>
                       <th className="px-3 py-2 text-right">Prix détail moy.</th>
+                      <th className="px-3 py-2">Présence</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -5,8 +5,9 @@ import {
   type ProduitDetailResponse,
   type ProduitStatType,
 } from "../api/produitsStatsApi";
-import { formatPrice, formatVolume } from "../utils/produitsFormat";
+import { formatPrice, formatPercent, formatVolume } from "../utils/produitsFormat";
 import OrigineBadge from "./OrigineBadge";
+import Meter from "./Meter";
 
 export type ProduitDetailTarget = {
   type: ProduitStatType;
@@ -121,9 +122,25 @@ export default function ProduitDetailModal({ target, annee, mois, agenceId, onCl
               </div>
             </div>
 
-            <div className="mb-5 rounded-lg border border-gray-100 bg-gray-50 p-3">
-              <p className="text-xs font-medium text-gray-500">Volume moyen</p>
-              <p className="mt-1 text-lg font-semibold text-gray-900">{formatVolume(detail.volume_moyen)}</p>
+            <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+                <p className="text-xs font-medium text-gray-500">Volume moyen</p>
+                <p className="mt-1 text-lg font-semibold text-gray-900">{formatVolume(detail.volume_moyen)}</p>
+              </div>
+              <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
+                <p className="text-xs font-medium text-gray-500">Présence chez les clients</p>
+                <p className="mt-1 text-lg font-semibold text-gray-900">
+                  {detail.presence.nb_clients} / {detail.presence.nb_clients_visites} clients
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="flex-1">
+                    <Meter percent={detail.presence.taux_presence} />
+                  </div>
+                  <span className="text-xs font-semibold text-gray-700">
+                    {formatPercent(detail.presence.taux_presence)}
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div className="mb-5">

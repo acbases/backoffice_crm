@@ -7,6 +7,12 @@ const api = axios.create({
 export type ProduitStatOrigine = "nos_produits" | "externe";
 export type ProduitStatType = "catalogue" | "autre";
 
+export type ProduitPresence = {
+  nb_clients: number;
+  nb_clients_visites: number;
+  taux_presence: number;
+};
+
 export type ProduitStat = {
   type: ProduitStatType;
   origine: ProduitStatOrigine;
@@ -18,10 +24,12 @@ export type ProduitStat = {
   prix_vente_gros_moyen: number | null;
   prix_vente_details_moyen: number | null;
   nb_occurrences: number;
+  presence: ProduitPresence;
 };
 
 export type ProduitsStatsResponse = {
   periode: { annee: number | null; mois: number | null; agence_id: number | null };
+  nb_clients_visites: number;
   prix_moyen_par_type: {
     prix_achat: number | null;
     prix_vente_gros: number | null;
@@ -64,6 +72,7 @@ export type ProduitDetailResponse = {
   nom: string;
   origine: ProduitStatOrigine;
   nb_occurrences: number;
+  presence: ProduitPresence;
   prix_moyen: {
     prix_achat: number | null;
     prix_vente_gros: number | null;

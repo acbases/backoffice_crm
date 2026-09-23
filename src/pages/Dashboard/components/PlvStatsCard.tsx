@@ -1,27 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { getPlvStats, type PlvClassementItem, type PlvStatsResponse } from "../api/plvStatsApi";
+import { formatPercent } from "../utils/produitsFormat";
 import AgenceSelect from "./AgenceSelect";
-
-const ACCENT_COLOR = "#2a78d6";
-const ACCENT_TRACK_COLOR = "#cde2fb";
-
-function formatPercent(value: number | null): string {
-  return value == null ? "—" : `${value.toLocaleString("fr-FR", { maximumFractionDigits: 1 })}%`;
-}
-
-function Meter({ percent }: { percent: number }) {
-  const clamped = Math.min(100, Math.max(0, percent));
-  return (
-    <div
-      className="h-2 w-full overflow-hidden rounded-full"
-      style={{ backgroundColor: ACCENT_TRACK_COLOR }}
-      role="img"
-      aria-label={`${formatPercent(percent)} de présence`}
-    >
-      <div className="h-full rounded-full" style={{ width: `${clamped}%`, backgroundColor: ACCENT_COLOR }} />
-    </div>
-  );
-}
+import Meter from "./Meter";
 
 function StatTile({ label, value }: { label: string; value: number }) {
   return (

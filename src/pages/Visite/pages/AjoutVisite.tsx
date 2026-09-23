@@ -7,6 +7,15 @@ import { getTypeVisites, type TypeVisiteItem } from '../api/typeVisiteApi';
 import { getCategorieVisites, type CategorieVisiteItem } from '../api/categorieVisiteApi';
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
+// Date du jour en heure locale (toISOString() se base sur UTC et décale la date la nuit).
+function todayLocalDateInputValue(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
 const initialForm = {
     idclient: "",
     idutilisateur: "",
@@ -118,8 +127,14 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
     // submit handlers
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setLoading(true);
         setError("");
+
+        if (form.date < todayLocalDateInputValue()) {
+            setError("Impossible de planifier une visite à une date antérieure à aujourd'hui.");
+            return;
+        }
+
+        setLoading(true);
 
         try {
             await createVisite({
@@ -273,7 +288,7 @@ export default function AjoutVisite({ onCreated }: AjoutVisiteProps) {
                         className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-red-500"
                         type="date"
                         required
-                        min={new Date().toISOString().split("T")[0]}
+                        min={todayLocalDateInputValue()}
                     />
                 </label>
             </div>
