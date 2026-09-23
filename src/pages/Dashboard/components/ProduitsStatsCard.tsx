@@ -4,6 +4,7 @@ import { formatPrice, formatPercent, formatVolume, formatVolumeNumber } from "..
 import ProduitsVolumePieChart from "./ProduitsVolumePieChart";
 import OrigineBadge, { ORIGINE_ACCENT_COLOR, ORIGINE_EXTERNE_COLOR } from "./OrigineBadge";
 import ProduitDetailModal, { type ProduitDetailTarget } from "./ProduitDetailModal";
+import AgenceSelect from "./AgenceSelect";
 
 const ACCENT_COLOR = ORIGINE_ACCENT_COLOR;
 const EXTERNE_COLOR = ORIGINE_EXTERNE_COLOR;
@@ -72,6 +73,7 @@ function ProductRow({
 export default function ProduitsStatsCard() {
   const [periode, setPeriode] = useState("");
   const [limit, setLimit] = useState(10);
+  const [agenceId, setAgenceId] = useState("");
   const [stats, setStats] = useState<ProduitsStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -83,6 +85,8 @@ export default function ProduitsStatsCard() {
     return { annee: y, mois: m };
   }, [periode]);
 
+  const agenceIdNumber = agenceId ? Number(agenceId) : undefined;
+
   useEffect(() => {
     let ignore = false;
 
@@ -90,7 +94,7 @@ export default function ProduitsStatsCard() {
       setLoading(true);
       setError("");
       try {
-        const data = await getProduitsStats({ annee, mois, limit });
+        const data = await getProduitsStats({ annee, mois, limit, agence_id: agenceIdNumber });
         if (!ignore) setStats(data);
       } catch (err) {
         console.error("Erreur chargement stats produits :", err);
@@ -104,7 +108,7 @@ export default function ProduitsStatsCard() {
     return () => {
       ignore = true;
     };
-  }, [annee, mois, limit]);
+  }, [annee, mois, limit, agenceIdNumber]);
 
   const partMarche = stats?.part_marche ?? null;
   const volumeNosProduits = partMarche?.nos_produits.volume ?? 0;
@@ -122,6 +126,7 @@ export default function ProduitsStatsCard() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <AgenceSelect value={agenceId} onChange={setAgenceId} />
           <input
             type="month"
             value={periode}
@@ -311,6 +316,7 @@ export default function ProduitsStatsCard() {
           target={selectedProduit}
           annee={annee}
           mois={mois}
+          agenceId={agenceIdNumber}
           onClose={() => setSelectedProduit(null)}
         />
       )}

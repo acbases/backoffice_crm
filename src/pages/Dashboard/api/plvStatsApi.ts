@@ -19,7 +19,7 @@ export type AutrePlvItem = {
 };
 
 export type PlvStatsResponse = {
-  periode: { annee: number | null; mois: number | null };
+  periode: { annee: number | null; mois: number | null; agence_id: number | null };
   total_visites_avec_rapport: number;
   total_visites_avec_plv: number;
   taux_presence_global: number;
@@ -31,6 +31,7 @@ export type PlvStatsResponse = {
 export type PlvStatsParams = {
   annee?: number;
   mois?: number;
+  agence_id?: number;
 };
 
 // GET dashboard PLV stats (présence des PLV pendant les visites)

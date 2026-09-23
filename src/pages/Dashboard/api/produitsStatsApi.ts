@@ -21,7 +21,7 @@ export type ProduitStat = {
 };
 
 export type ProduitsStatsResponse = {
-  periode: { annee: number | null; mois: number | null };
+  periode: { annee: number | null; mois: number | null; agence_id: number | null };
   prix_moyen_par_type: {
     prix_achat: number | null;
     prix_vente_gros: number | null;
@@ -39,6 +39,7 @@ export type ProduitsStatsParams = {
   limit?: number;
   annee?: number;
   mois?: number;
+  agence_id?: number;
 };
 
 // GET dashboard produits stats (prix moyens, top produits, part de marché)
@@ -57,7 +58,7 @@ export type PrixReleveExtreme = {
 };
 
 export type ProduitDetailResponse = {
-  periode: { annee: number | null; mois: number | null };
+  periode: { annee: number | null; mois: number | null; agence_id: number | null };
   type: ProduitStatType;
   produit_id: number | null;
   nom: string;
@@ -89,6 +90,7 @@ export type ProduitDetailParams = {
   nom?: string;
   annee?: number;
   mois?: number;
+  agence_id?: number;
 };
 
 // GET détail d'un produit (prix/volume moyens, min, max) pour la fiche cliquable

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { getPlvStats, type PlvClassementItem, type PlvStatsResponse } from "../api/plvStatsApi";
+import AgenceSelect from "./AgenceSelect";
 
 const ACCENT_COLOR = "#2a78d6";
 const ACCENT_TRACK_COLOR = "#cde2fb";
@@ -52,6 +53,7 @@ function ClassementRow({ plv, rank }: { plv: PlvClassementItem; rank: number }) 
 
 export default function PlvStatsCard() {
   const [periode, setPeriode] = useState("");
+  const [agenceId, setAgenceId] = useState("");
   const [stats, setStats] = useState<PlvStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -62,6 +64,8 @@ export default function PlvStatsCard() {
     return { annee: y, mois: m };
   }, [periode]);
 
+  const agenceIdNumber = agenceId ? Number(agenceId) : undefined;
+
   useEffect(() => {
     let ignore = false;
 
@@ -69,7 +73,7 @@ export default function PlvStatsCard() {
       setLoading(true);
       setError("");
       try {
-        const data = await getPlvStats({ annee, mois });
+        const data = await getPlvStats({ annee, mois, agence_id: agenceIdNumber });
         if (!ignore) setStats(data);
       } catch (err) {
         console.error("Erreur chargement stats PLV :", err);
@@ -83,7 +87,7 @@ export default function PlvStatsCard() {
     return () => {
       ignore = true;
     };
-  }, [annee, mois]);
+  }, [annee, mois, agenceIdNumber]);
 
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -94,6 +98,7 @@ export default function PlvStatsCard() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <AgenceSelect value={agenceId} onChange={setAgenceId} />
           <input
             type="month"
             value={periode}

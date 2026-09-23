@@ -10,6 +10,9 @@ import ListeVisite from "./pages/Visite/pages/ListeVisite";
 import VisitesPage from "./pages/Visite/pages/VisitesPage";
 import ClientQrCode from "./pages/Clients/pages/QrCode";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import VisiteStats from "./pages/Dashboard/pages/VisiteStats";
+import ProduitStats from "./pages/Dashboard/pages/ProduitStats";
+import PlvStats from "./pages/Dashboard/pages/PlvStats";
 import Utilisateurs from "./pages/Utilisateurs/Utilisateur";
 import Ajout from "./pages/Utilisateurs/pages/Ajout";
 import Liste from "./pages/Utilisateurs/pages/Liste";
@@ -50,7 +53,12 @@ export default function App() {
             <Route path="ajout" element={<Ajout />} />
             <Route path="modifRole" element={<ModifRole />} />
           </Route>
-          <Route path="dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
+          <Route path="dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>}>
+            <Route index element={<Navigate to="visite" replace />} />
+            <Route path="visite" element={<VisiteStats />} />
+            <Route path="produit" element={<ProduitStats />} />
+            <Route path="plv" element={<PlvStats />} />
+          </Route>
         </Route>
       </Routes>
     </Router>

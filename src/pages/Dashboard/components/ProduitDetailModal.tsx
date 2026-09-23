@@ -18,6 +18,7 @@ type ProduitDetailModalProps = {
   target: ProduitDetailTarget;
   annee?: number;
   mois?: number;
+  agenceId?: number;
   onClose: () => void;
 };
 
@@ -39,7 +40,7 @@ function VolumeExtremeTag({ entry }: { entry: PrixReleveExtreme | null }) {
   );
 }
 
-export default function ProduitDetailModal({ target, annee, mois, onClose }: ProduitDetailModalProps) {
+export default function ProduitDetailModal({ target, annee, mois, agenceId, onClose }: ProduitDetailModalProps) {
   const [detail, setDetail] = useState<ProduitDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -57,6 +58,7 @@ export default function ProduitDetailModal({ target, annee, mois, onClose }: Pro
           nom: target.type === "autre" ? target.nom : undefined,
           annee,
           mois,
+          agence_id: agenceId,
         });
         if (!ignore) setDetail(data);
       } catch (err) {
@@ -71,7 +73,7 @@ export default function ProduitDetailModal({ target, annee, mois, onClose }: Pro
     return () => {
       ignore = true;
     };
-  }, [target.type, target.produitId, target.nom, annee, mois]);
+  }, [target.type, target.produitId, target.nom, annee, mois, agenceId]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
